@@ -1,4 +1,12 @@
 <div id="app">
-  <button @click="count++">{{ count }}</button>
-  <div class="game">aeee</div>
+  <div class="game">
+    <div v-for="row in items" class="row">
+      <buttonesque v-for="cell in row" v-bind:g="cell" class="cell" v-bind:name="cell"  v-bind:greet="greet"  v-bind:isactive="isactive(cell)" v-bind:key="cell">
+      </buttonesque>
+    </div>
+  </div>
+
+  <div class="right">
+    <p v-for="task in options">{{task}}</p>
+  </div>
 </div>

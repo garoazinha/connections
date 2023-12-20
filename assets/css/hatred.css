@@ -1,3 +1,37 @@
 .game {
-  background-color: blue;
+  display: grid;
+  border-color: red;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  border-color: blue;
+}
+
+.cell {
+  background-color: gray;
+  padding: 15px;
+}
+
+.grid {
+  display: grid;
+  border-color: red;
+}
+
+.checkbox {
+  display: block;
+}
+
+.hidden-checkbox {
+  position: absolute;
+  opacity: 0;
+}
+
+.hater {
+  border: 1px blue;
+}
+
+.selected {
+  border: 2px solid blue;
 }
