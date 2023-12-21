@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "numbers.js": "^1.0.1",
     "vue": "^3.3.11"
   },
   "devDependencies": {

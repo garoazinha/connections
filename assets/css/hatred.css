@@ -28,10 +28,12 @@
   opacity: 0;
 }
 
-.hater {
-  border: 1px blue;
-}
 
 .selected {
   border: 2px solid blue;
+}
+
+
+.found {
+  border: 2px solid yellow;
 }

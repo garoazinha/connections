@@ -22,12 +22,8 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import { createApp } from 'vue/dist/vue.esm-bundler.js'
-import VueApp from "./vueSetup"
 
-let rawItems = [["BOUGH", "COUGH", "DOUGH", "TOUGH"],
-["BUNKER", "FAIRWAY", "GREEN", "ROUGH"], 
-["ENOUGH", "MERCY", "STOP", "UNCLE"],
-["BAWDY", "BLUE", "COARSE", "RISQUE"]]
+import VueApp from "./vueSetup"
 
 createApp(VueApp).mount("#app")
 
