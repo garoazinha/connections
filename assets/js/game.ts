@@ -3,6 +3,8 @@ import { createApp, ref } from 'vue/dist/vue.esm-bundler.js'
 
 import { Buttonesque as buttonesque } from "./button"
 
+import Mixin from './helper'
+
 let rawItems = [["BOUGH", "COUGH", "DOUGH", "TOUGH"],
 ["BUNKER", "FAIRWAY", "GREEN", "ROUGH"], 
 ["ENOUGH", "MERCY", "STOP", "UNCLE"],
@@ -19,7 +21,7 @@ const game = `
     </div>
   </div>
 
-  <div v-for="row in items" class="row">
+  <div v-for="row, index in items" class="row" v-bind:class="getClass(index)">
     <buttonesque v-for="cell in row"
                  v-bind:g="cell"
                  class="cell"
@@ -43,7 +45,6 @@ export default {
     let options = []
     const shuffledItems = shuffleMatrix(rawItems)
     let items =  ref(shuffledItems)
-    console.log(items)
     let foundConnections = ref([])
     return {
       foundConnections,
@@ -74,43 +75,37 @@ export default {
         console.log('DONE')
         this.foundConnections.push(options.sort())
 
-        const hate = options.map((e) => {
-          return this.editBoard(e)
-           
-        })
-
         let board = [...this.items]
-        hate.map((n,i) => {
-          const rowToMove = [...board[0]]
-          const x = n[0]
-          const y = n[1]
 
-          console.log(`n ${n} e i ${i} e ${board[x][y]} e ${rowToMove[i]}`)
+        const itemsToMove = board[0].filter((obj) => {return !this.options.includes(obj)})
 
-          board[0][i] = board[x][y]
-          board[x][y] = rowToMove[i]
+        options.map((e) => {
+          return this.getCoords(e, this.items)
+        }).filter((coord, i) => {
+          return coord[0] !== 0
+        }).map((coords, i) => {
+          const x = coords[0]
+          const y = coords[1]
+          const movable = itemsToMove[i]
+          return {x,y, movable}
+        }).forEach((obj) => {
+          this.items[obj.x][obj.y] = obj.movable
         })
-        board.splice(0,1)
-
-        this.items = board
+      
+        this.items.splice(0,1)
         
       } else {
         console.log('NOT DONE')
       }
     },
-    editBoard(e) {
-      
-      let love = this.items.map((row,i) => {
-        if (!row.includes(e)) {
-          return null
-        }
-        return [i,row.indexOf(e)]
-      }).filter((a) => a != null )
-    
-      return love[0]
-
-    }
+    // getCoords(e) {
+    //   return this.getCoords(e, this.items)
+    // },
+    // getClass(index) {
+    //   return this.getClass(index)
+    // }
   },
+  mixins: [Mixin],
   watch: {
     options: {
       handler(newVal, oldVal) {
