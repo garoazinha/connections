@@ -2,6 +2,7 @@
 import { createApp, ref } from 'vue/dist/vue.esm-bundler.js'
 
 import { Buttonesque as buttonesque } from "./button"
+import { TransitionGroup, Transition } from 'vue/dist/vue.esm-bundler.js'
 
 import Mixin from './helper'
 
@@ -14,25 +15,32 @@ let rawItems = [["BOUGH", "COUGH", "DOUGH", "TOUGH"],
 
 const game = `
 <div class="game">
-  <div v-for="row in foundConnections" class="row found">
-    <div v-for="item in row" class="cell">
-      {{item }}
+  <transition-group name="fade">
+      <div v-for="row, index in foundConnections" class="row found done" v-bind:key="index">
+          <div v-for="item in row" class="cell" style="background-color: yellow;" v-bind:key="item">
+            {{ item }}
+          </div>
+      </div>
+  </transition-group>
+  
+  <div class="row">
+    <transition-group name="board">
+      <buttonesque v-for="cell in items"
+                  v-bind:g="cell"
+                  class="cell"
+                  v-bind:name="cell"
+                  v-bind:greet="greet"
+                  v-bind:isactive="isactive(cell)"
+                  v-bind:key="cell"
+                  v-bind:hidden="isFound(cell)"> </buttonesque>
+      
 
-    </div>
-  </div>
-
-  <div v-for="row, index in items" class="row" v-bind:class="getClass(index)">
-    <buttonesque v-for="cell in row"
-                 v-bind:g="cell"
-                 class="cell"
-                 v-bind:name="cell"
-                 v-bind:greet="greet"
-                 v-bind:isactive="isactive(cell)"
-                 v-bind:key="cell"> </buttonesque>
-
-  </div>
+    </transition-group>
+  <div>
 </div>
 `
+
+export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export default {
   components: {
@@ -44,7 +52,7 @@ export default {
   data() {
     let options = []
     const shuffledItems = shuffleMatrix(rawItems)
-    let items =  ref(shuffledItems)
+    let items =  ref(shuffledItems.flat())
     let foundConnections = ref([])
     return {
       foundConnections,
@@ -53,6 +61,9 @@ export default {
     }
   },
   methods: {
+    onLeave(el, done) {
+      console.log('LOVE')
+    },
     greet(item) {
       if (this.options.includes(item)) {
         this.deselect(item)
@@ -66,6 +77,9 @@ export default {
     isactive(item) {        
       return this.options.includes(item)
     },
+    isFound(cell) {
+      return this.foundConnections.flat().includes(cell)
+    },
     checkCorrectness(options) {
       
       let stuff = rawItems.filter((row) => {
@@ -73,27 +87,15 @@ export default {
       })
       if (stuff.length > 0) {
         console.log('DONE')
-        this.foundConnections.push(options.sort())
+        
 
         let board = [...this.items]
 
-        const itemsToMove = board[0].filter((obj) => {return !this.options.includes(obj)})
+        const itemsToMove = board.filter((obj) => {return !this.options.includes(obj)})
 
-        options.map((e) => {
-          return this.getCoords(e, this.items)
-        }).filter((coord, i) => {
-          return coord[0] !== 0
-        }).map((coords, i) => {
-          const x = coords[0]
-          const y = coords[1]
-          const movable = itemsToMove[i]
-          return {x,y, movable}
-        }).forEach((obj) => {
-          this.items[obj.x][obj.y] = obj.movable
-        })
-      
-        this.items.splice(0,1)
-        
+        this.items = options.concat(itemsToMove)
+
+        this.foundConnections.push(options.sort())
       } else {
         console.log('NOT DONE')
       }

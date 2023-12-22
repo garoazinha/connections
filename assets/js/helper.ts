@@ -16,11 +16,11 @@ export default {
   methods: {
     getCoords(e, board)  {
       return board.map((row,i) => {
-        if (!row.includes(e)) {
+        if (row !== e) {
           return null
         }
-        return [i,row.indexOf(e)]
-      }).filter((a) => a != null )[0]
+        return i
+      }).filter((a) => a != null )
     
     },
     getClass(index) {
