@@ -68,3 +68,8 @@
 .fade-leave-active {
   position: absolute;
 }
+
+.clickable {
+  background-color: red;
+  disabled: false;
+}

@@ -38,7 +38,14 @@ const game = `
       
 
     </transition-group>
+    </div>
   <div>
+
+  <button @click="checkSolution()" v-bind:class="{ clickable: this.options.length === 4 }" v-bind:disabled="this.options.length < 4">Click</button>
+  <span v-for="a,i in attempts">
+    <3
+  </span>
+  </div>
 </div>
 `
 
@@ -69,14 +76,19 @@ export default {
     const shuffledItems = request.startingGroups
     let items =  ref(shuffledItems.flat())
     let foundConnections = ref([])
+    let attempts = ref([])
     return {
       request,
       foundConnections,
       options,
-      items
+      items,
+      attempts
     }
   },
   methods: {
+    checkSolution(e) {
+      this.checkCorrectness(this.options)
+    },
     onLeave(el, done) {
       console.log('LOVE')
     },
@@ -116,23 +128,18 @@ export default {
         this.foundConnections.push({name: stuff[0].name, children: options.sort(), stringified: options.sort().join(', ')})
         console.log(this.foundConnections)
       } else {
+        this.attempts++
         console.log('NOT DONE')
       }
+      this.options = []
     },
-    // getCoords(e) {
-    //   return this.getCoords(e, this.items)
-    // },
-    // getClass(index) {
-    //   return this.getClass(index)
-    // }
   },
   mixins: [Mixin],
   watch: {
     options: {
       handler(newVal, oldVal) {
         if (newVal.length == 4) {
-          this.checkCorrectness(newVal)
-          this.options = []
+          this.done = true
         }
       },
       deep: true 
