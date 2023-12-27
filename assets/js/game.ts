@@ -7,15 +7,17 @@ import data from './request.json' assert { type: 'json' };
 
 import Mixin from './helper'
 
-let rawItems = [["BOUGH", "COUGH", "DOUGH", "TOUGH"],
-["BUNKER", "FAIRWAY", "GREEN", "ROUGH"], 
-["ENOUGH", "MERCY", "STOP", "UNCLE"],
-["BAWDY", "BLUE", "COARSE", "RISQUE"]]
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 const game = `
 <div class="game">
-  <transition-group name="fade">
-      <div v-for="row, index in foundConnections" class="found done" v-bind:key="index">
+  
+    <div class="done" >
+    <transition-group name="fade" >
+      <div v-for="(row, index) in foundConnections" class="found-row found" v-bind:key="row.name">
           <span>
             {{ row.name }}
           </span>
@@ -23,7 +25,9 @@ const game = `
             {{ row.stringified }}
           </div>
       </div>
-  </transition-group>
+      </transition-group>
+      </div>
+  
   
   <div class="row">
     <transition-group name="board">
@@ -43,7 +47,7 @@ const game = `
 
   <button @click="checkSolution()" v-bind:class="{ clickable: this.options.length === 4 }" v-bind:disabled="this.options.length < 4">Click</button>
   <span v-for="a,i in attempts">
-    <3
+    *
   </span>
   </div>
 </div>
@@ -108,7 +112,7 @@ export default {
     isFound(cell) {
       return this.foundConnections.flat().includes(cell)
     },
-    checkCorrectness(options) {
+    async checkCorrectness(options) {
       let stuff = Object.keys(this.request.groups).map((group) => {      
         return {members: this.request.groups[group].members, name: group}
       }).filter((row) => {
@@ -118,15 +122,18 @@ export default {
       if (stuff.length > 0) {
         console.log('DONE')
         
-
         let board = [...this.items]
 
-        const itemsToMove = board.filter((obj) => {return !this.options.includes(obj)})
+        const foundChildren = this.foundConnections.map((found) => { return found.children }).flat()
 
-        this.items = options.concat(itemsToMove)
+        const itemsToMove = board.filter((obj) => {return !(this.options.includes(obj) || foundChildren.includes(obj)) })
+
+        this.items = foundChildren.concat(options).concat(itemsToMove)
+
+        await sleep(500)
 
         this.foundConnections.push({name: stuff[0].name, children: options.sort(), stringified: options.sort().join(', ')})
-        console.log(this.foundConnections)
+
       } else {
         this.attempts++
         console.log('NOT DONE')
