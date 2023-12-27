@@ -3,6 +3,7 @@ import { createApp, ref } from 'vue/dist/vue.esm-bundler.js'
 
 import { Buttonesque as buttonesque } from "./button"
 import { TransitionGroup, Transition } from 'vue/dist/vue.esm-bundler.js'
+import data from './request.json' assert { type: 'json' };
 
 import Mixin from './helper'
 
@@ -11,14 +12,15 @@ let rawItems = [["BOUGH", "COUGH", "DOUGH", "TOUGH"],
 ["ENOUGH", "MERCY", "STOP", "UNCLE"],
 ["BAWDY", "BLUE", "COARSE", "RISQUE"]]
 
-
-
 const game = `
 <div class="game">
   <transition-group name="fade">
-      <div v-for="row, index in foundConnections" class="row found done" v-bind:key="index">
-          <div v-for="item in row" class="cell" style="background-color: yellow;" v-bind:key="item">
-            {{ item }}
+      <div v-for="row, index in foundConnections" class="found done" v-bind:key="index">
+          <span>
+            {{ row.name }}
+          </span>
+          <div>
+            {{ row.stringified }}
           </div>
       </div>
   </transition-group>
@@ -40,7 +42,19 @@ const game = `
 </div>
 `
 
-export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+type requestType = {
+  id: Number,
+  groups: {
+
+  },
+  startingGroups: String[][]
+}
+
+type GroupType = {
+  level: Number,
+  groups: String[]
+}
 
 export default {
   components: {
@@ -50,11 +64,13 @@ export default {
 
   },
   data() {
+    let request: requestType = data 
     let options = []
-    const shuffledItems = shuffleMatrix(rawItems)
+    const shuffledItems = request.startingGroups
     let items =  ref(shuffledItems.flat())
     let foundConnections = ref([])
     return {
+      request,
       foundConnections,
       options,
       items
@@ -81,10 +97,12 @@ export default {
       return this.foundConnections.flat().includes(cell)
     },
     checkCorrectness(options) {
-      
-      let stuff = rawItems.filter((row) => {
-        return areEqual(row, options)
+      let stuff = Object.keys(this.request.groups).map((group) => {      
+        return {members: this.request.groups[group].members, name: group}
+      }).filter((row) => {
+        return areEqual(row.members, options)
       })
+
       if (stuff.length > 0) {
         console.log('DONE')
         
@@ -95,7 +113,8 @@ export default {
 
         this.items = options.concat(itemsToMove)
 
-        this.foundConnections.push(options.sort())
+        this.foundConnections.push({name: stuff[0].name, children: options.sort(), stringified: options.sort().join(', ')})
+        console.log(this.foundConnections)
       } else {
         console.log('NOT DONE')
       }

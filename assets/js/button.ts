@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { Transition } from 'vue'
 
 export const Buttonesque = {
   data() {
@@ -25,7 +26,10 @@ export const Buttonesque = {
   },
   computed: {
     pickThis() {
-      return ["BOUGH", "COUGH", "DOUGH", "TOUGH"].includes(this.g)
+      return ["BUZZ",
+      "CALL",
+      "DIAL",
+      "RING"].includes(this.g)
     }
   },
   emits: {
