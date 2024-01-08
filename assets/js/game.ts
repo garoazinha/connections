@@ -16,17 +16,20 @@ const game = `
 <div class="game">
   
     <div class="done" >
-    <transition-group name="fade" >
-      <div v-for="(row, index) in foundConnections" class="found-row found" v-bind:key="row.name">
-          <span>
-            {{ row.name }}
-          </span>
-          <div>
-            {{ row.stringified }}
+    <transition-group name="fade">
+      <div v-for="(row, index) in foundConnections" v-bind:key="row.name">
+          <div class="found">
+            <span>
+              {{ row.name }}
+            </span>
+            <div>
+              {{ row.stringified }}
+            </div>
           </div>
+        
       </div>
       </transition-group>
-      </div>
+    </div>
   
   
   <div class="row">
@@ -62,11 +65,6 @@ type requestType = {
   startingGroups: String[][]
 }
 
-type GroupType = {
-  level: Number,
-  groups: String[]
-}
-
 export default {
   components: {
     buttonesque
@@ -78,9 +76,9 @@ export default {
     let request: requestType = data 
     let options = []
     const shuffledItems = request.startingGroups
-    let items =  ref(shuffledItems.flat())
-    let foundConnections = ref([])
-    let attempts = ref([])
+    let items =  shuffledItems.flat()
+    let foundConnections = []
+    let attempts = []
     return {
       request,
       foundConnections,
@@ -90,7 +88,7 @@ export default {
     }
   },
   methods: {
-    checkSolution(e) {
+    checkSolution(_e) {
       this.checkCorrectness(this.options)
     },
     onLeave(el, done) {
@@ -113,8 +111,8 @@ export default {
       return this.foundConnections.flat().includes(cell)
     },
     async checkCorrectness(options) {
-      let stuff = Object.keys(this.request.groups).map((group) => {      
-        return {members: this.request.groups[group].members, name: group}
+      let stuff = this.request.groups.map((group) => {      
+        return {members: group.members, name: group.name}
       }).filter((row) => {
         return areEqual(row.members, options)
       })
@@ -130,58 +128,20 @@ export default {
 
         this.items = foundChildren.concat(options).concat(itemsToMove)
 
-        await sleep(500)
+        await sleep(1000)
 
         this.foundConnections.push({name: stuff[0].name, children: options.sort(), stringified: options.sort().join(', ')})
 
       } else {
-        this.attempts++
         console.log('NOT DONE')
       }
       this.options = []
-    },
+    }
   },
   mixins: [Mixin],
-  watch: {
-    options: {
-      handler(newVal, oldVal) {
-        if (newVal.length == 4) {
-          this.done = true
-        }
-      },
-      deep: true 
-    },
-  },
+ 
   template: game,
 }
-
-function shuffleMatrix(matrix) {
-  let flat = matrix.flat()
-  return matrix.map((row, i) => {
-    return row.map((cell, j) => {
-      const randI = Math.floor(Math.random() * (flat.length));
-      const value = flat[randI]
-      flat.splice(randI, 1)
-      return value
-    })
-  })
-}
-
-// function checkCorrectness(options, shuffledItems, rawItems) {
-//   let stuff = rawItems.filter((row) => {
-//     return areEqual(row, options)
-//   })
-
-//   if (stuff.length > 0) {
-//     console.log('DONE')
-//     let remove = shuffledItems.indexOf(stuff[0])
-//     shuffledItems.splice(remove, 1)
-    
-//   } else {
-//     console.log('NOT DONE')
-//   }
-
-// }
 
 function areEqual(array1, array2) {
   if (array1.length === array2.length) {

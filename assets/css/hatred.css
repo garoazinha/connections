@@ -5,11 +5,6 @@
   height: 500px;
 }
 
-.found-row {
-  display:flex;
-  flex-direction: column;
-}
-
 .done {
   position: absolute;
 }
@@ -23,15 +18,17 @@
 .cell {
   background-color: gray;
   padding: 15px;
+  height: 56px;
+  border: 1px solid palevioletred;
 }
 
 .selected {
-  border: 2px solid blue;
+  background-color: blueviolet;
 }
-
 
 .found {
   border: 2px solid yellow;
+  height: 56px;
 }
 
 .pick {
@@ -41,8 +38,7 @@
 .board-move,
 .board-enter-active,
 .board-leave-active {
-  transition-duration: 1s;
-  transition-timing-function: ease;
+  transition: 1s linear;
 }
 
 .board-leave-active {
@@ -51,39 +47,24 @@
 
 .done {
   position: absolute;
-  top:0;
+  top: 0;
   width: 100%;
   z-index: 100;
   background-color: aqua;
 }
 
-
-/* 1. declare transition */
 .fade-move,
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.6s ease;
+  transition: all 0.5s ease;
 }
 
-/* 2. declare enter from and leave to state */
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-  transform: scaleY(0.01) translate(30px, 0);
-}
-
-/* 3. ensure leaving items are taken out of layout flow so that moving
-      animations can be calculated correctly. */
-.fade-leave-active {
-  position: absolute;
+  background-color: purple;
 }
 
 .clickable {
   background-color: red;
-}
-
-@keyframes fade {
-
-
-  
 }

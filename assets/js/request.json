@@ -1,7 +1,8 @@
 {
   "id": 192,
-  "groups": {
-    "CONTACT VIA PHONE": {
+  "groups": [
+    {
+      "name": "CONTACT VIA PHONE",
       "level": 0,
       "members": [
         "BUZZ",
@@ -10,7 +11,8 @@
         "RING"
       ]
     },
-    "BOOK SECTIONS": {
+    {
+      "name": "BOOK SECTIONS",
       "level": 1,
       "members": [
         "APPENDIX",
@@ -19,7 +21,8 @@
         "PREFACE"
       ]
     },
-    "WEE": {
+    {
+      "name": "WEE",
       "level": 2,
       "members": [
         "DINKY",
@@ -28,7 +31,8 @@
         "SLIGHT"
       ]
     },
-    "CARTOON MICE": {
+    {
+      "name": "CARTOON MICE",
       "level": 3,
       "members": [
         "ITCHY",
@@ -37,7 +41,7 @@
         "SPEEDY"
       ]
     }
-  },
+  ],
   "startingGroups": [
     [
       "DINKY",
