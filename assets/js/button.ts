@@ -11,7 +11,8 @@ export const Buttonesque = {
     g: String,
     greet: Function,
     isactive: Boolean,
-    hidden: Boolean
+    hidden: Boolean,
+    shake: Boolean
   },
   template: `
     <div v-bind:class="{ selected: isactive, pick: pickThis, inactive: hidden }"  @click="toggle">{{ g }}</div>

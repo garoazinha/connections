@@ -2,11 +2,11 @@
 import { createApp, ref } from 'vue/dist/vue.esm-bundler.js'
 
 import { Buttonesque as buttonesque } from "./button"
+import { Modal as modal } from "./modal"
 import { TransitionGroup, Transition } from 'vue/dist/vue.esm-bundler.js'
 import data from './request.json' assert { type: 'json' };
 
 import Mixin from './helper'
-
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -14,20 +14,22 @@ function sleep(ms) {
 
 const game = `
 <div class="game">
-  
+    <transition>
+      <modal v-bind:done="this.status === 'DONE'" v-show="isOpen" v-bind:open-modal="openModal"></modal>
+    </transition>
     <div class="done" >
-    <transition-group name="fade">
-      <div v-for="(row, index) in foundConnections" v-bind:key="row.name">
-          <div class="found">
-            <span>
-              {{ row.name }}
-            </span>
-            <div>
-              {{ row.stringified }}
+      <transition-group name="fade" type="animation">
+        <div v-for="(row, index) in foundConnections" v-bind:key="row.name" class="card">
+            <div class="found">
+              <span>
+                {{ row.name }}
+              </span>
+              <div>
+                {{ row.stringified }}
+              </div>
             </div>
-          </div>
-        
-      </div>
+          
+        </div>
       </transition-group>
     </div>
   
@@ -41,14 +43,15 @@ const game = `
                   v-bind:greet="greet"
                   v-bind:isactive="isactive(cell)"
                   v-bind:key="cell"
-                  v-bind:hidden="isFound(cell)"> </buttonesque>
+                  v-bind:hidden="isFound(cell)"
+                  v-bind:shake="false"> </buttonesque>
       
 
     </transition-group>
     </div>
   <div>
 
-  <button @click="checkSolution()" v-bind:class="{ clickable: this.options.length === 4 }" v-bind:disabled="this.options.length < 4">Click</button>
+  <button @click="checkSolution()" v-bind:class="{ clickable: this.options.length === 4 }" v-bind:disabled="this.options.length < 4 || this.loading">Click</button>
   <span v-for="a,i in attempts">
     *
   </span>
@@ -67,24 +70,31 @@ type requestType = {
 
 export default {
   components: {
-    buttonesque
+    buttonesque,
+    modal
   },
   setup() {
 
   },
   data() {
-    let request: requestType = data 
-    let options = []
+    const request: requestType = data 
+    const options = []
     const shuffledItems = request.startingGroups
-    let items =  shuffledItems.flat()
-    let foundConnections = []
-    let attempts = []
+    const items =  shuffledItems.flat()
+    const foundConnections = []
+    const attempts = []
+    const isOpen = true
+    const loading = false
+    const status = ''
     return {
       request,
       foundConnections,
       options,
       items,
-      attempts
+      attempts,
+      isOpen,
+      loading,
+      status
     }
   },
   methods: {
@@ -118,6 +128,7 @@ export default {
       })
 
       if (stuff.length > 0) {
+        this.loading = true
         console.log('DONE')
         
         let board = [...this.items]
@@ -135,11 +146,27 @@ export default {
       } else {
         console.log('NOT DONE')
       }
+      this.loading = false
       this.options = []
-    }
+    },
+    openModal() {
+      this.isOpen = !this.isOpen
+    },
   },
   mixins: [Mixin],
- 
+  watch: { 
+    foundConnections: {
+      async handler(oldValue, newValue) {
+        console.log(newValue)
+        if (newValue.length == 4) {
+          this.status = 'DONE'
+          await sleep(1000)
+          this.openModal()
+        }
+      },
+      deep:true,
+    }
+  },
   template: game,
 }
 

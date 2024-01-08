@@ -1,5 +1,4 @@
 .game {
-
   border-color: red;
   position: relative;
   height: 500px;
@@ -53,18 +52,45 @@
   background-color: aqua;
 }
 
+.fade {
+  border:blue 3px solid;
+}
+
 .fade-move,
 .fade-enter-active,
 .fade-leave-active {
-  transition: all 0.5s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  background-color: purple;
+  animation: bounce-in 1s;
 }
 
 .clickable {
   background-color: red;
+}
+
+.modal {
+  z-index: 1000;
+  width: 100%;
+  background-color: pink;
+  height: 500px;
+  position: absolute
+}
+
+.card {
+  background-color: purple;
+}
+
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(1);
+  }
+
+  10%{
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
