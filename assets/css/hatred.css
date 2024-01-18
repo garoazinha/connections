@@ -1,37 +1,27 @@
 .game {
   border-color: red;
   position: relative;
-  height: 500px;
-}
-
-.done {
-  position: absolute;
+  max-width: 500px;
 }
 
 .row {
   display: grid;
-  grid-template-columns: 25% 25% 25% 25%;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   border-color: blue;
+  gap: 5px;
+  width: 100%;
 }
 
 .cell {
   background-color: gray;
-  padding: 15px;
-  height: 56px;
+  padding: 3px;
   border: 1px solid palevioletred;
+  text-align: center;
+  height: 70px;
 }
 
 .selected {
   background-color: blueviolet;
-}
-
-.found {
-  border: 2px solid yellow;
-  height: 56px;
-}
-
-.pick {
-  background-color: brown;
 }
 
 .board-move,
@@ -47,9 +37,13 @@
 .done {
   position: absolute;
   top: 0;
-  width: 100%;
+  width:100%;
   z-index: 100;
-  background-color: aqua;
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .fade {
@@ -68,14 +62,16 @@
 
 .modal {
   z-index: 1000;
-  width: 100%;
   background-color: pink;
   height: 500px;
-  position: absolute
+  position: absolute;
+  width: 50%;
 }
 
 .card {
   background-color: purple;
+  min-height: 70px;
+  width: 100%;
 }
 
 

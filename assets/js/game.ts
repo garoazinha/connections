@@ -13,10 +13,15 @@ function sleep(ms) {
 }
 
 const game = `
-<div class="game">
+<section style="width: 50%;">
     <transition>
       <modal v-bind:done="this.status === 'DONE'" v-show="isOpen" v-bind:open-modal="openModal"></modal>
     </transition>
+
+    <div>
+      Escolha quatro grupos de quatro
+    </div>
+  <div class="game">
     <div class="done" >
       <transition-group name="fade" type="animation">
         <div v-for="(row, index) in foundConnections" v-bind:key="row.name" class="card">
@@ -33,30 +38,33 @@ const game = `
       </transition-group>
     </div>
   
-  
-  <div class="row">
-    <transition-group name="board">
-      <buttonesque v-for="cell in items"
-                  v-bind:g="cell"
-                  class="cell"
-                  v-bind:name="cell"
-                  v-bind:greet="greet"
-                  v-bind:isactive="isactive(cell)"
-                  v-bind:key="cell"
-                  v-bind:hidden="isFound(cell)"
-                  v-bind:shake="false"> </buttonesque>
-      
+    <div class="row">
+      <transition-group name="board">
+        <buttonesque v-for="cell in items"
+                    v-bind:g="cell"
+                    class="cell"
+                    v-bind:name="cell"
+                    v-bind:select="select"
+                    v-bind:isactive="isactive(cell)"
+                    v-bind:key="cell"
+                    v-bind:hidden="isFound(cell)"
+                    v-bind:shake="false"></buttonesque>
+        
 
-    </transition-group>
+      </transition-group>
     </div>
-  <div>
-
-  <button @click="checkSolution()" v-bind:class="{ clickable: this.options.length === 4 }" v-bind:disabled="this.options.length < 4 || this.loading">Click</button>
-  <span v-for="a,i in attempts">
-    *
-  </span>
   </div>
-</div>
+  
+  <div>
+    <button @click="checkSolution()" 
+      v-bind:class="{ clickable: this.options.length === 4 }"
+      v-bind:disabled="this.options.length < 4 || this.loading">Click</button>
+      <span v-for="n in mistakesLeft">
+        *
+      </span>
+  </div>
+
+</section>
 `
 
 
@@ -83,6 +91,7 @@ export default {
     const items =  shuffledItems.flat()
     const foundConnections = []
     const attempts = []
+    const mistakesLeft = 4
     const isOpen = true
     const loading = false
     const status = ''
@@ -94,17 +103,26 @@ export default {
       attempts,
       isOpen,
       loading,
-      status
+      status,
+      mistakesLeft
+    }
+  },
+  computed: {
+    notFound() {
+      const foundGroups = this.foundConnections.map((found) => found.children)
+      return this.request.groups.filter((group) => {
+        return foundGroups.map(element => {
+          return this.areEqual(element, group.members)
+        }).filter((e) => e === true ).length === 0;
+
+      })
     }
   },
   methods: {
     checkSolution(_e) {
       this.checkCorrectness(this.options)
     },
-    onLeave(el, done) {
-      console.log('LOVE')
-    },
-    greet(item) {
+    select(item) {
       if (this.options.includes(item)) {
         this.deselect(item)
       } else {
@@ -124,27 +142,18 @@ export default {
       let stuff = this.request.groups.map((group) => {      
         return {members: group.members, name: group.name}
       }).filter((row) => {
-        return areEqual(row.members, options)
+        return this.areEqual(row.members, options)
       })
 
       if (stuff.length > 0) {
         this.loading = true
         console.log('DONE')
+        this.solveConnection(stuff)
         
-        let board = [...this.items]
-
-        const foundChildren = this.foundConnections.map((found) => { return found.children }).flat()
-
-        const itemsToMove = board.filter((obj) => {return !(this.options.includes(obj) || foundChildren.includes(obj)) })
-
-        this.items = foundChildren.concat(options).concat(itemsToMove)
-
-        await sleep(1000)
-
-        this.foundConnections.push({name: stuff[0].name, children: options.sort(), stringified: options.sort().join(', ')})
 
       } else {
         console.log('NOT DONE')
+        this.mistakesLeft--
       }
       this.loading = false
       this.options = []
@@ -152,34 +161,50 @@ export default {
     openModal() {
       this.isOpen = !this.isOpen
     },
+    async solveConnection(given) {
+      let board = [...this.items]
+
+        const foundChildren = this.foundConnections.map((found) => { return found.children }).flat()
+
+        const itemsToMove = board.filter((obj) => {return !(this.options.includes(obj) || foundChildren.includes(obj)) })
+
+        this.items = foundChildren.concat(this.options).concat(itemsToMove)
+
+        await sleep(1000)
+
+        this.foundConnections.push({name: given, children: this.options.sort(), stringified: this.options.sort().join(', ')})
+    },
+    async finishGame() {
+      for await (const element of this.notFound) {
+        this.options = element.members
+        console.log(this.options)
+        await this.solveConnection(element.name)
+        await sleep(1000)
+      }
+    }
   },
   mixins: [Mixin],
   watch: { 
     foundConnections: {
-      async handler(oldValue, newValue) {
-        console.log(newValue)
-        if (newValue.length == 4) {
-          this.status = 'DONE'
+      async handler(newValue, oldValue) {
+        if (newValue.length === 4) {
+          if (this.mistakesLeft > 0) {
+            this.status = 'DONE'
+          }
           await sleep(1000)
           this.openModal()
         }
       },
       deep:true,
+    },
+    mistakesLeft: {
+      handler(newValue, oldValue) {
+        console.log(newValue)
+        if (newValue === 0) {
+          this.finishGame()
+        }
+      }
     }
   },
   template: game,
-}
-
-function areEqual(array1, array2) {
-  if (array1.length === array2.length) {
-    return array1.every(element => {
-      if (array2.includes(element)) {
-        return true;
-      }
-
-      return false;
-    });
-  }
-
-  return false;
 }

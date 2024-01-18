@@ -9,29 +9,19 @@ export const Buttonesque = {
   },
   props: {
     g: String,
-    greet: Function,
+    select: Function,
     isactive: Boolean,
     hidden: Boolean,
     shake: Boolean
   },
   template: `
-    <div v-bind:class="{ selected: isactive, pick: pickThis, inactive: hidden }"  @click="toggle">{{ g }}</div>
+    <div v-bind:class="{ selected: isactive, inactive: hidden }"  @click="toggle">{{ g }}</div>
   `,
   methods: {
     toggle() {
-      this.greet(this.g)
+      this.select(this.g)
     },
-    putStyle() {
-      ["BOUGH", "COUGH", "DOUGH", "TOUGH"].includes(this.g)
-    }
-  },
-  computed: {
-    pickThis() {
-      return ["BUZZ",
-      "CALL",
-      "DIAL",
-      "RING"].includes(this.g)
-    }
+    
   },
   emits: {
     someEvent(payload: {}) {
