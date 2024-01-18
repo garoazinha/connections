@@ -148,8 +148,7 @@ export default {
       if (stuff.length > 0) {
         this.loading = true
         console.log('DONE')
-        this.solveConnection(stuff)
-        
+        await this.solveConnection(stuff[0].name, options)
 
       } else {
         console.log('NOT DONE')
@@ -161,24 +160,23 @@ export default {
     openModal() {
       this.isOpen = !this.isOpen
     },
-    async solveConnection(given) {
+    async solveConnection(name, options) {
       let board = [...this.items]
 
-        const foundChildren = this.foundConnections.map((found) => { return found.children }).flat()
+      const foundChildren = this.foundConnections.map((found) => { return found.children }).flat()
 
-        const itemsToMove = board.filter((obj) => {return !(this.options.includes(obj) || foundChildren.includes(obj)) })
+      const itemsToMove = board.filter((obj) => {return !(options.includes(obj) || foundChildren.includes(obj)) })
 
-        this.items = foundChildren.concat(this.options).concat(itemsToMove)
+      this.items = foundChildren.concat(options).concat(itemsToMove)
 
-        await sleep(1000)
+      await sleep(1000)
 
-        this.foundConnections.push({name: given, children: this.options.sort(), stringified: this.options.sort().join(', ')})
+      this.foundConnections.push({name: name, children: options.sort(), stringified: options.sort().join(', ')})
     },
     async finishGame() {
       for await (const element of this.notFound) {
-        this.options = element.members
         console.log(this.options)
-        await this.solveConnection(element.name)
+        await this.solveConnection(element.name, element.members)
         await sleep(1000)
       }
     }
