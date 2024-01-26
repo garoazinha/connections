@@ -3,8 +3,10 @@ import { createApp, ref } from 'vue/dist/vue.esm-bundler.js'
 
 import { Buttonesque as buttonesque } from "./button"
 import { Modal as modal } from "./modal"
+import { Instructions as instruction } from "./instructions"
 import { TransitionGroup, Transition } from 'vue/dist/vue.esm-bundler.js'
 import data from './request.json' assert { type: 'json' };
+
 
 import Mixin from './helper'
 
@@ -13,60 +15,74 @@ function sleep(ms) {
 }
 
 const game = `
-<section style="width: 50%;">
+<section class="container">
+    <div class="header">
+      <div></div>
+      <div>CONNECTIONS</div>
+      <div><button @click="handleToggleInstruction()">?</button></div>
+    
+    </div>
     <transition>
-      <modal v-bind:done="this.status === 'DONE'" v-show="isOpen" v-bind:open-modal="openModal"></modal>
+      <modal v-bind:status="this.status" v-show="isOpen" v-bind:open-modal="toggleModal"></modal>
     </transition>
-
-    <div>
+    <instruction v-show="visibleInstruction" v-bind:toggle-instruction="handleToggleInstruction"> </instruction>
+  <section v-show="this.status !== ''">
+    <div class="title">
       Escolha quatro grupos de quatro
     </div>
-  <div class="game">
-    <div class="done" >
-      <transition-group name="fade" type="animation">
-        <div v-for="(row, index) in foundConnections" v-bind:key="row.name" class="card">
-            <div class="found">
-              <span>
-                {{ row.name }}
-              </span>
-              <div>
-                {{ row.stringified }}
+    <div class="game">
+      <div class="done" >
+        <transition-group name="fade" type="animation">
+          <div v-for="(row, index) in foundConnections" v-bind:key="row.name" class="card">
+              <div class="found">
+                <span>
+                  {{ row.name }}
+                </span>
+                <div>
+                  {{ row.stringified }}
+                </div>
               </div>
-            </div>
+            
+          </div>
+        </transition-group>
+      </div>
+    
+      <div class="row">
+        <transition-group name="board">
+          <buttonesque v-for="cell in items"
+                      v-bind:g="cell"
+                      class="cell"
+                      v-bind:name="cell"
+                      v-bind:select="select"
+                      v-bind:isactive="isactive(cell)"
+                      v-bind:key="cell"
+                      v-bind:hidden="isFound(cell)"
+                      v-bind:wrong="iswrong(cell)"
+                      v-bind:right="isright(cell)"></buttonesque>
           
-        </div>
-      </transition-group>
-    </div>
-  
-    <div class="row">
-      <transition-group name="board">
-        <buttonesque v-for="cell in items"
-                    v-bind:g="cell"
-                    class="cell"
-                    v-bind:name="cell"
-                    v-bind:select="select"
-                    v-bind:isactive="isactive(cell)"
-                    v-bind:key="cell"
-                    v-bind:hidden="isFound(cell)"
-                    v-bind:shake="false"></buttonesque>
-        
 
-      </transition-group>
+        </transition-group>
+      </div>
     </div>
-  </div>
-  
-  <div>
-    <button @click="checkSolution()" 
-      v-bind:class="{ clickable: this.options.length === 4 }"
-      v-bind:disabled="this.options.length < 4 || this.loading">Click</button>
-      <span v-for="n in mistakesLeft">
-        *
-      </span>
-  </div>
+    
+    <div class="button-group" v-show="status !== 'DONE' && status !== 'FAILED'">
+      <button @click="checkSolution()" 
+        v-bind:class="{ clickable: this.options.length === 4 }"
+        v-bind:disabled="this.options.length < 4 || this.loading">Click</button>
+        <div>
+          <span v-for="n in mistakesLeft">
+            *
+          </span>
+        </div>
+    </div>
+
+    <div class="button-group" v-show="status === 'DONE' || status === 'FAILED'">
+      <button @click="toggleModal">Ver resultados</button>
+    </div>
+  </section>
 
 </section>
 `
-
 
 type requestType = {
   id: Number,
@@ -79,7 +95,8 @@ type requestType = {
 export default {
   components: {
     buttonesque,
-    modal
+    modal,
+    instruction
   },
   setup() {
 
@@ -95,6 +112,9 @@ export default {
     const isOpen = true
     const loading = false
     const status = ''
+    const visibleInstruction = false
+    const shakeables = []
+    const popables = []
     return {
       request,
       foundConnections,
@@ -104,7 +124,10 @@ export default {
       isOpen,
       loading,
       status,
-      mistakesLeft
+      mistakesLeft,
+      visibleInstruction,
+      shakeables,
+      popables
     }
   },
   computed: {
@@ -135,8 +158,14 @@ export default {
     isactive(item) {        
       return this.options.includes(item)
     },
+    iswrong(item) {        
+      return this.shakeables.includes(item)
+    },
     isFound(cell) {
       return this.foundConnections.flat().includes(cell)
+    },
+    isright(cell) {
+      return this.popables.includes(cell)
     },
     async checkCorrectness(options) {
       let stuff = this.request.groups.map((group) => {      
@@ -152,15 +181,25 @@ export default {
 
       } else {
         console.log('NOT DONE')
+        this.shakeables = this.options
         this.mistakesLeft--
+        await sleep(500)
+        this.shakeables = []
       }
       this.loading = false
       this.options = []
     },
-    openModal() {
+    toggleModal() {
+      if (this.status === '') {
+        this.status = 'STARTED'
+      }
       this.isOpen = !this.isOpen
     },
     async solveConnection(name, options) {
+      this.popables = options
+      await sleep(500)
+      this.popables = []
+
       let board = [...this.items]
 
       const foundChildren = this.foundConnections.map((found) => { return found.children }).flat()
@@ -174,11 +213,17 @@ export default {
       this.foundConnections.push({name: name, children: options.sort(), stringified: options.sort().join(', ')})
     },
     async finishGame() {
+      this.loading = true
       for await (const element of this.notFound) {
         console.log(this.options)
         await this.solveConnection(element.name, element.members)
         await sleep(1000)
       }
+      this.status = 'FAILED'
+      this.loading = false
+    },
+    handleToggleInstruction() {
+      this.visibleInstruction = !this.visibleInstruction
     }
   },
   mixins: [Mixin],
@@ -190,7 +235,7 @@ export default {
             this.status = 'DONE'
           }
           await sleep(1000)
-          this.openModal()
+          this.toggleModal()
         }
       },
       deep:true,

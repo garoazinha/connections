@@ -1,8 +1,22 @@
-.game {
-  border-color: red;
-  position: relative;
-  max-width: 500px;
+
+:root {
+  --phone-width: 350px;
+  --desktop-width: 600px;
 }
+
+.game {
+  width: var(--desktop-width);
+  position: relative;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 50%;
+}
+
+
 
 .row {
   display: grid;
@@ -14,10 +28,10 @@
 
 .cell {
   background-color: gray;
-  padding: 3px;
   border: 1px solid palevioletred;
   text-align: center;
   height: 70px;
+  line-height: 70px;
 }
 
 .selected {
@@ -62,10 +76,45 @@
 
 .modal {
   z-index: 1000;
-  background-color: pink;
-  height: 500px;
   position: absolute;
   width: 50%;
+  display: flex;
+  flex-direction: column;
+  height: unset;
+}
+
+.start-modal {
+  background-color: pink;
+  bottom: 0;
+  top: 0;
+}
+
+.instruction-modal {
+  background-color: azure;
+  width: var(--desktop-width);
+  margin-top: 50px;
+}
+
+.modal-p {
+  margin: 50px 20px;
+}
+
+.modal-p > div {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.leave {
+  height: 600px;
+  width: 40%;
+}
+
+.header {
+  width: var(--desktop-width);
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 
 .card {
@@ -74,6 +123,35 @@
   width: 100%;
 }
 
+.title {
+  white-space: nowrap;
+  margin: 20px 0;
+}
+
+.button-group {
+  margin-top: 50px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.play-button {
+  padding: 15px;
+  background-color: beige;
+  color: blue;
+  display: block;
+}
+
+.modal-title {
+  font-weight: bold;
+  font-size: large;
+  padding: 10px 0;
+}
+
+.close-button {
+  position: absolute;
+  top: 3px;
+  right: 20px;
+}
 
 @keyframes bounce-in {
   0% {
@@ -88,5 +166,65 @@
   }
   100% {
     transform: scale(1);
+  }
+}
+
+.pop {
+  animation: bounce-in 0.5s linear;
+}
+
+.shake {
+  animation: shake 0.5s linear both;
+  transform: translate3d(0, 0, 0);
+  border: 1px solid red;
+}
+
+@keyframes shake {
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+@media (max-width: 600px) {
+  .game {
+    width: var(--phone-width)
+  }
+
+  .modal {
+    width: 100%;
+  }
+
+  .title {
+    width: 100%;
+    white-space: nowrap;
+  }
+
+  .container {
+    width: 100%;
+  }
+
+  .header {
+    width: var(--phone-width);
+  }
+
+  .instruction-modal {
+    width: var(--phone-width)
   }
 }
