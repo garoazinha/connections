@@ -33,7 +33,7 @@ const game = `
     <div class="game">
       <div class="done" >
         <transition-group name="fade" type="animation">
-          <div v-for="(row, index) in foundConnections" v-bind:key="row.name" class="card">
+          <div v-for="(row, index) in foundConnections" v-bind:key="row.name" class="card" v-bind:style="{ backgroundColor: getColor(row.level) }">
               <div class="found">
                 <span>
                   {{ row.name }}
@@ -142,6 +142,16 @@ export default {
     }
   },
   methods: {
+    getColor(level) {
+      const colorMap = {
+        0: '#f9df6d',
+        1: '#a0c35a',
+        2: '#b0c4ef',
+        3: '#ba81c5'
+      }
+
+      return colorMap[level]
+    },
     checkSolution(_e) {
       this.checkCorrectness(this.options)
     },
@@ -169,7 +179,7 @@ export default {
     },
     async checkCorrectness(options) {
       let stuff = this.request.groups.map((group) => {      
-        return {members: group.members, name: group.name}
+        return {members: group.members, name: group.name, level: group.level}
       }).filter((row) => {
         return this.areEqual(row.members, options)
       })
@@ -177,7 +187,7 @@ export default {
       if (stuff.length > 0) {
         this.loading = true
         console.log('DONE')
-        await this.solveConnection(stuff[0].name, options)
+        await this.solveConnection(stuff[0].name, options, stuff[0].level)
 
       } else {
         console.log('NOT DONE')
@@ -195,7 +205,9 @@ export default {
       }
       this.isOpen = !this.isOpen
     },
-    async solveConnection(name, options) {
+    async solveConnection(name, options, level) {
+
+      console.log(level, name, options)
       this.popables = options
       await sleep(500)
       this.popables = []
@@ -210,13 +222,13 @@ export default {
 
       await sleep(1000)
 
-      this.foundConnections.push({name: name, children: options.sort(), stringified: options.sort().join(', ')})
+      this.foundConnections.push({name: name, children: options.sort(), stringified: options.sort().join(', '), level: level})
     },
     async finishGame() {
+      console.log(this.notFound)
       this.loading = true
       for await (const element of this.notFound) {
-        console.log(this.options)
-        await this.solveConnection(element.name, element.members)
+        await this.solveConnection(element.name, element.members, element.level)
         await sleep(1000)
       }
       this.status = 'FAILED'
@@ -242,7 +254,6 @@ export default {
     },
     mistakesLeft: {
       handler(newValue, oldValue) {
-        console.log(newValue)
         if (newValue === 0) {
           this.finishGame()
         }
