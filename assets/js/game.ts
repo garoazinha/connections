@@ -31,6 +31,9 @@ const game = `
       Escolha quatro grupos de quatro
     </div>
     <div class="game">
+      <transition>
+        <div class="flash" v-show="flash">Esse já foi!</div>
+      </transition>
       <div class="done" >
         <transition-group name="fade" type="animation">
           <div v-for="(row, index) in foundConnections" v-bind:key="row.name" class="card" v-bind:style="{ backgroundColor: getColor(row.level) }">
@@ -115,6 +118,7 @@ export default {
     const visibleInstruction = false
     const shakeables = []
     const popables = []
+    const flash = false
     return {
       request,
       foundConnections,
@@ -127,7 +131,8 @@ export default {
       mistakesLeft,
       visibleInstruction,
       shakeables,
-      popables
+      popables,
+      flash
     }
   },
   computed: {
@@ -177,7 +182,20 @@ export default {
     isright(cell) {
       return this.popables.includes(cell)
     },
+    hasBeenTried(options) {
+      return this.attempts.some((a) => this.areEqual(options, a))
+    },
     async checkCorrectness(options) {
+      
+      if (this.hasBeenTried(options)) {
+        this.flash = true
+        setTimeout(() => {
+          this.flash = false
+        }, 500)
+        this.options = []
+        return;
+      }
+
       let stuff = this.request.groups.map((group) => {      
         return {members: group.members, name: group.name, level: group.level}
       }).filter((row) => {
@@ -192,9 +210,11 @@ export default {
       } else {
         console.log('NOT DONE')
         this.shakeables = this.options
+        this.attempts.push(this.options)
         this.mistakesLeft--
         await sleep(500)
         this.shakeables = []
+        await sleep(500)
       }
       this.loading = false
       this.options = []
@@ -207,7 +227,6 @@ export default {
     },
     async solveConnection(name, options, level) {
 
-      console.log(level, name, options)
       this.popables = options
       await sleep(500)
       this.popables = []
@@ -225,7 +244,7 @@ export default {
       this.foundConnections.push({name: name, children: options.sort(), stringified: options.sort().join(', '), level: level})
     },
     async finishGame() {
-      console.log(this.notFound)
+      await sleep(500)
       this.loading = true
       for await (const element of this.notFound) {
         await this.solveConnection(element.name, element.members, element.level)

@@ -43,7 +43,7 @@
 .board-move,
 .board-enter-active,
 .board-leave-active {
-  transition: 1s linear;
+  transition: 0.9s linear;
 }
 
 .board-leave-active {
@@ -88,7 +88,7 @@
 }
 
 .modal__content {
-  width: 50%;
+  width: max(50%, var(--phone-width));
   background-color: green;
   height: 100%;
   position: relative;
@@ -103,6 +103,14 @@
   background-color: azure;
   width: var(--desktop-width);
   margin-top: 50px;
+}
+
+.flash {
+  position: absolute;
+  margin: auto;
+  background-color: aqua;
+  transition: opacity 0.5s linear;
+  z-index: 10000;
 }
 
 .modal-p {
