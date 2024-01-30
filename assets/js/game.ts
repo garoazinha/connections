@@ -1,12 +1,12 @@
 
 import { createApp, ref } from 'vue/dist/vue.esm-bundler.js'
 
-import { Buttonesque as buttonesque } from "./button"
-import { Modal as modal } from "./modal"
-import { Instructions as instruction } from "./instructions"
+import { Buttonesque as buttonesque } from "./components/button"
+import { Modal as modal } from "./components/modal"
+import { Instructions as instruction } from "./components/instructions"
 import { TransitionGroup, Transition } from 'vue/dist/vue.esm-bundler.js'
 import data from './request.json' assert { type: 'json' };
-
+import { store } from './store'
 
 import Mixin from './helper'
 
@@ -70,7 +70,7 @@ const game = `
     
     <div class="button-group" v-show="status !== 'DONE' && status !== 'FAILED'">
       <button @click="checkSolution()" 
-        v-bind:class="{ clickable: this.options.length === 4 }"
+        class="clickable"
         v-bind:disabled="this.options.length < 4 || this.loading">Click</button>
         <div>
           <span v-for="n in mistakesLeft">
@@ -105,35 +105,11 @@ export default {
 
   },
   data() {
-    const request: requestType = data 
-    const options = []
-    const shuffledItems = request.startingGroups
-    const items =  shuffledItems.flat()
-    const foundConnections = []
-    const attempts = []
-    const mistakesLeft = 4
-    const isOpen = true
-    const loading = false
-    const status = ''
-    const visibleInstruction = false
-    const shakeables = []
-    const popables = []
-    const flash = false
-    return {
-      request,
-      foundConnections,
-      options,
-      items,
-      attempts,
-      isOpen,
-      loading,
-      status,
-      mistakesLeft,
-      visibleInstruction,
-      shakeables,
-      popables,
-      flash
-    }
+    return store
+  },
+  mounted() {
+    this.request = data
+    this.items = this.request.startingGroups.flat()
   },
   computed: {
     notFound() {
@@ -144,6 +120,9 @@ export default {
         }).filter((e) => e === true ).length === 0;
 
       })
+    },
+    mistakesLeft() {
+      return 4 - this.attempts.length
     }
   },
   methods: {
@@ -186,35 +165,33 @@ export default {
       return this.attempts.some((a) => this.areEqual(options, a))
     },
     async checkCorrectness(options) {
-      
+      this.loading = true
       if (this.hasBeenTried(options)) {
         this.flash = true
         setTimeout(() => {
           this.flash = false
         }, 500)
         this.options = []
+        this.loading = false
         return;
       }
 
-      let stuff = this.request.groups.map((group) => {      
+      const stuff = this.request.groups.map((group) => {      
         return {members: group.members, name: group.name, level: group.level}
       }).filter((row) => {
         return this.areEqual(row.members, options)
       })
 
       if (stuff.length > 0) {
-        this.loading = true
-        console.log('DONE')
+
         await this.solveConnection(stuff[0].name, options, stuff[0].level)
 
       } else {
-        console.log('NOT DONE')
         this.shakeables = this.options
         this.attempts.push(this.options)
-        this.mistakesLeft--
         await sleep(500)
         this.shakeables = []
-        await sleep(500)
+        
       }
       this.loading = false
       this.options = []
@@ -226,7 +203,6 @@ export default {
       this.isOpen = !this.isOpen
     },
     async solveConnection(name, options, level) {
-
       this.popables = options
       await sleep(500)
       this.popables = []
@@ -245,6 +221,7 @@ export default {
     },
     async finishGame() {
       await sleep(500)
+      this.options = []
       this.loading = true
       for await (const element of this.notFound) {
         await this.solveConnection(element.name, element.members, element.level)

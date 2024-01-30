@@ -1,6 +1,8 @@
 import { ref } from 'vue'
 import { Transition } from 'vue'
 
+import { store } from '../store'
+
 export const Buttonesque = {
   data() {
     return {
@@ -22,13 +24,6 @@ export const Buttonesque = {
     toggle() {
       this.select(this.g)
     },
-    
-  },
-  emits: {
-    someEvent(payload: {}) {
-      console.log('miau')
-      return true
-    }
   }
 }
 

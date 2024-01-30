@@ -72,9 +72,16 @@
   animation: bounce-in 1s;
 }
 
+.clickable:disabled {
+  background-color: transparent;
+  color: lightgrey;
+}
+
+
 .clickable {
   background-color: red;
 }
+
 
 .modal {
   z-index: 1000;
@@ -88,7 +95,7 @@
 }
 
 .modal__content {
-  width: max(50%, var(--phone-width));
+  width: var(--desktop-width);
   background-color: green;
   height: 100%;
   position: relative;
@@ -224,8 +231,8 @@
     width: var(--phone-width)
   }
 
-  .modal {
-    width: 100%;
+  .modal__content {
+    width: var(--phone-width);
   }
 
   .title {
