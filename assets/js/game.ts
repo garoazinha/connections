@@ -105,7 +105,7 @@ export default {
 
   },
   data() {
-    return store
+    return store;
   },
   mounted() {
     this.request = data
@@ -138,31 +138,6 @@ export default {
     },
     checkSolution(_e) {
       this.checkCorrectness(this.options)
-    },
-    select(item) {
-      if (this.options.includes(item)) {
-        this.deselect(item)
-      } else {
-        this.options.length < 4 ? this.options.push(item) : null
-      }
-    },
-    deselect(item) {
-      this.options.splice(this.options.indexOf(item), 1)
-    },
-    isactive(item) {        
-      return this.options.includes(item)
-    },
-    iswrong(item) {        
-      return this.shakeables.includes(item)
-    },
-    isFound(cell) {
-      return this.foundConnections.flat().includes(cell)
-    },
-    isright(cell) {
-      return this.popables.includes(cell)
-    },
-    hasBeenTried(options) {
-      return this.attempts.some((a) => this.areEqual(options, a))
     },
     async checkCorrectness(options) {
       this.loading = true

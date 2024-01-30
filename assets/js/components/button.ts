@@ -5,24 +5,17 @@ import { store } from '../store'
 
 export const Buttonesque = {
   data() {
-    return {
-      hi: false
-    }
+    return { store };
   },
   props: {
-    g: String,
-    select: Function,
-    isactive: Boolean,
-    hidden: Boolean,
-    wrong: Boolean,
-    right: Boolean
+    g: String
   },
   template: `
-    <div v-bind:class="{ selected: isactive, inactive: hidden, shake: wrong, pop: right }"  @click="toggle">{{ g }}</div>
+    <div v-bind:class="{ selected: store.isactive(g), inactive: store.isFound(g), shake: store.iswrong(g), pop: store.isright(g) }" @click="toggle">{{ g }}</div>
   `,
   methods: {
     toggle() {
-      this.select(this.g)
+      store.select(this.g)
     },
   }
 }
