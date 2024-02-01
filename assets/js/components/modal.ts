@@ -8,8 +8,8 @@ export const Modal = {
   },
   template: `
 
-      <div class="modal start-modal" v-bind:style="{ backgroundColor: background }" v-bind:class="{ opaque: done || failed }" @click="handleToggleModal()">
-        <div class="modal__content" v-bind:class="{ leave: done || failed }" @click.stop="">
+      <div class="modal" v-bind:class="{ opaque: done || failed, 'start-modal': !(done && failed) }" @click="handleToggleModal()">
+        <div class="modal__content" v-bind:class="{ modal__secondary: done || failed }" @click.stop="">
           <nav class="close-button" v-show="done || failed">
             <button @click="handleToggleModal()" >X</button>
           </nav>
@@ -63,9 +63,7 @@ export const Modal = {
 
     },
     idle() {
-
       return this.status === ''
-
     }
   }
 }

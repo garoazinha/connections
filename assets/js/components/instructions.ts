@@ -6,8 +6,8 @@ export const Instructions = {
   },
   template: `
 
-      <div class="modal">
-        <div class="instruction-modal">
+      <div class="modal opaque">
+        <div class="modal__content modal__secondary">
           <nav class="close-button">
             <button @click="toggleInstruction()">X</button>
           </nav>
