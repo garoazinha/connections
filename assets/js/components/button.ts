@@ -11,7 +11,11 @@ export const Buttonesque = {
     g: String
   },
   template: `
-    <div v-bind:class="{ selected: store.isactive(g), inactive: store.isFound(g), shake: store.iswrong(g), pop: store.isright(g) }" @click="toggle">{{ g }}</div>
+    <div v-bind:class="{ selected: store.isactive(g),
+                         inactive: store.isFound(g),
+                         shake: store.iswrong(g),
+                         pop: store.isright(g),
+                         fastpop: store.fastPop.includes(g) }" @click="toggle">{{ g }}</div>
   `,
   methods: {
     toggle() {

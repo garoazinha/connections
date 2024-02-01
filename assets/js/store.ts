@@ -13,15 +13,28 @@ export const store = reactive({
   shakeables: [],
   popables: [],
   flash: false,
-  select(item) {
+  fastPop: [],
+  async select(item) {
     if (this.options.includes(item)) {
       this.deselect(item)
     } else {
-      this.options.length < 4 ? this.options.push(item) : null
+      if (this.options.length < 4) {
+        this.options.push(item) 
+        this.fastPop.push(item)
+        await setTimeout(() => {
+          this.fastPop = this.fastPop.filter((i) => i !== item)
+        }, 100)
+        
+      }
     }
   },
-  deselect(item) {
+  async deselect(item) {
     this.options.splice(this.options.indexOf(item), 1)
+    this.fastPop.push(item)
+    await setTimeout(() => {
+      this.fastPop = this.fastPop.filter((i) => i !== item)
+    }, 100)
+
   },
   isactive(item) {        
     return this.options.includes(item)

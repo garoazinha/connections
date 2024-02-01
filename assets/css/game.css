@@ -1,4 +1,13 @@
 
+
+
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-VariableFont_slnt,wght.ttf') format('truetype');
+
+}
+
 :root {
   --phone-width: 350px;
   --desktop-width: 600px;
@@ -6,6 +15,21 @@
   --green: #a0c35a;
   --blue: #b0c4ef;
   --purple: #ba81c5;
+  --pretty-purple: #8c32a1;
+  --pretty-purple-dark: #501a5c;
+  --cute-light-green: #edfaf7;
+  --cute-darker-green: #b7c9c5;
+  --cute-picked-green: #7cd9c3;
+  --cute-blue: #9FC7D6;
+  --cute-border-blue:  #4f6d78;
+  --smart-blue:  	#cfe2f3;
+  --smart-border-blue:  	#2986cc;
+}
+
+.game__title {
+  font-family: 'Inter';
+  font-size: x-large;
+  font-weight: bold;
 }
 
 .game {
@@ -29,15 +53,16 @@
 }
 
 .cell {
-  background-color: gray;
-  border: 1px solid palevioletred;
+  background-color: var(--cute-light-green);
+  border: 1px var(--cute-darker-green) solid;
   text-align: center;
   height: 70px;
   line-height: 70px;
+  border-radius: 3px;
 }
 
 .selected {
-  background-color: blueviolet;
+  background-color: var(--cute-picked-green);
 }
 
 .board-move,
@@ -77,11 +102,10 @@
   color: lightgrey;
 }
 
-
 .clickable {
-  background-color: red;
+  background-color: var(--pretty-purple-dark);
+  color: white;
 }
-
 
 .modal {
   z-index: 1000;
@@ -89,27 +113,33 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-
 }
 
 .modal__content {
   width: var(--desktop-width);
-  background-color: green;
-  height: 100%;
+  background-color: var(--pretty-purple);
   position: relative;
+  top: 150px;
+  opacity: 100%;
 }
 
 .start-modal {
-  bottom: 0;
   top: 0;
+  bottom: 0
+}
+
+.modal.start-modal.opaque {
+  background-color: rgba(159, 199, 214, 0.5);
 }
 
 .instruction-modal {
-  background-color: azure;
+  background-color: var(--smart-blue);
   width: var(--desktop-width);
-  margin-top: 50px;
+  top: 150px;
+  border: 1px var(--smart-border-blue) solid;
+  position: relative;
+  border-radius: 5px;
 }
 
 .flash {
@@ -120,18 +150,24 @@
   z-index: 10000;
 }
 
-.modal-p {
-  margin: 50px 20px;
+.modal__p {
+  margin: 30px 20px;
 }
 
-.modal-p > div {
+.modal__p > div {
   display: flex;
   justify-content: center;
   flex-direction: column;
+  gap: 30px;
 }
 
 .leave {
-  height: 600px;
+  background-color: var(--cute-blue);
+  top: 25px;
+  border: 1px var(--cute-border-blue) solid;
+  border-radius: 5px;
+  width: 50%;
+
 }
 
 .header {
@@ -142,9 +178,29 @@
 }
 
 .card {
-  background-color: purple;
   min-height: 70px;
   width: 100%;
+  border-radius: 5px;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.card > span {
+  margin: 0 auto;
+  display: block;
+}
+
+.btn {
+  padding: 10px;
+  display: block;
+  border-radius: 4px;
+}
+
+.attempts {
+  padding: 10px;
 }
 
 .title {
@@ -156,25 +212,37 @@
   margin-top: 50px;
   display: flex;
   justify-content: space-between;
+
+}
+
+.result-button {
+  margin: 0 auto;
+  background-color: var(--pretty-purple-dark);
+  color: white;
 }
 
 .play-button {
-  padding: 15px;
-  background-color: beige;
-  color: blue;
-  display: block;
+  background-color: white;
+  color: var(--pretty-purple-dark);
+  font-weight: bold;
 }
 
-.modal-title {
+.modal__title {
   font-weight: bold;
   font-size: large;
+  margin: 0 auto;
   padding: 10px 0;
 }
 
 .close-button {
   position: absolute;
-  top: 3px;
+  top: 10px;
   right: 20px;
+}
+
+
+.fastpop {
+  animation: bounce-in 0.1s;
 }
 
 @keyframes bounce-in {
@@ -200,7 +268,6 @@
 .shake {
   animation: shake 0.5s linear both;
   transform: translate3d(0, 0, 0);
-  border: 1px solid red;
 }
 
 @keyframes shake {

@@ -18,7 +18,7 @@ const game = `
 <section class="container">
     <div class="header">
       <div></div>
-      <div>CONNECTIONS</div>
+      <div class="game__title">CONNECTIONS</div>
       <div><button @click="handleToggleInstruction()">?</button></div>
     
     </div>
@@ -37,15 +37,12 @@ const game = `
       <div class="done" >
         <transition-group name="fade" type="animation">
           <div v-for="(row, index) in foundConnections" v-bind:key="row.name" class="card" v-bind:style="{ backgroundColor: getColor(row.level) }">
-              <div class="found">
-                <span>
-                  {{ row.name }}
-                </span>
-                <div>
-                  {{ row.stringified }}
-                </div>
-              </div>
-            
+            <span>
+              {{ row.name }}
+            </span>
+            <span>
+              {{ row.stringified }}
+            </span>
           </div>
         </transition-group>
       </div>
@@ -70,9 +67,9 @@ const game = `
     
     <div class="button-group" v-show="status !== 'DONE' && status !== 'FAILED'">
       <button @click="checkSolution()" 
-        class="clickable"
-        v-bind:disabled="this.options.length < 4 || this.loading">Click</button>
-        <div>
+        class="btn clickable"
+        v-bind:disabled="this.options.length < 4 || this.loading">Enviar</button>
+        <div class="attempts">
           <span v-for="n in mistakesLeft">
             *
           </span>
@@ -80,7 +77,7 @@ const game = `
     </div>
 
     <div class="button-group" v-show="status === 'DONE' || status === 'FAILED'">
-      <button @click="toggleModal">Ver resultados</button>
+      <button @click="toggleModal" class="btn result-button">Ver resultados</button>
     </div>
   </section>
 
@@ -214,10 +211,11 @@ export default {
     foundConnections: {
       async handler(newValue, oldValue) {
         if (newValue.length === 4) {
+          await sleep(1000)
           if (this.mistakesLeft > 0) {
+            
             this.status = 'DONE'
           }
-          await sleep(1000)
           this.toggleModal()
         }
       },

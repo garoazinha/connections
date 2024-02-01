@@ -56,7 +56,7 @@ config :app, AppWeb.Endpoint,
 config :app, AppWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg|ttf)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/app_web/(controllers|live|components)/.*(ex|heex)$"
     ]
