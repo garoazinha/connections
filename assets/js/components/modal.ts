@@ -20,8 +20,7 @@ export const Modal = {
             </div>
             <div v-if="idle">
               <h1 class="modal__title game__title">Connections</h1>
-              Olá você sabe jogar connections? É um joguinho em que você tem que acertar as palavras que estão conectadas!
-              É super divertido
+              <p>Encontre as palavras conectadas! xD</p>
                                 
               <button class="btn play-button" @click="handleToggleModal()">Jogar</button>
             </div>

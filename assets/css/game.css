@@ -11,10 +11,10 @@
 :root {
   --phone-width: 350px;
   --desktop-width: 600px;
-  --yellow: #f9df6d;
-  --green: #a0c35a;
-  --blue: #b0c4ef;
-  --purple: #ba81c5;
+  --yellow: #F7F3CE;
+  --green: #99DDCC;
+  --blue: #BAD7DF;
+  --purple: #DBC6EB;
   --pretty-purple: #8c32a1;
   --pretty-purple-dark: #501a5c;
   --cute-light-green: #edfaf7;
@@ -24,6 +24,10 @@
   --cute-border-blue:  #4f6d78;
   --smart-blue:  	#cfe2f3;
   --smart-border-blue:  	#2986cc;
+  --adorable-border-pink: #FF90BC;
+  --adorable-pink: #FFC0D9;
+  --adorable-blueish: #33186B;
+  --card-green: #183D3D;
 }
 
 .game__title {
@@ -141,10 +145,27 @@
 
 .flash {
   position: absolute;
-  margin: auto;
   background-color: aqua;
   transition: opacity 0.5s linear;
   z-index: 10000;
+  width: 100px;
+  display: flex;
+  background-color: var(--adorable-pink);
+  border: 1px solid var(--adorable-border-pink);
+  padding: 10px 3px;
+  align-items: center;
+  justify-content: center;
+  color: var(--adorable-blueish)
+}
+
+.fadeintou-enter-active,
+.fadeintou-leave-active {
+  transition: opacity 0.1s ease;
+}
+
+.fadeintou-enter-from,
+.fadeintou-leave-to {
+  opacity: 0;
 }
 
 .modal__p {
@@ -163,8 +184,6 @@
   top: 25px;
   border: 1px var(--cute-border-blue) solid;
   border-radius: 5px;
-  width: 50%;
-
 }
 
 .header {
@@ -178,7 +197,7 @@
   min-height: 70px;
   width: 100%;
   border-radius: 5px;
-  color: white;
+  color: var(--card-green);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -314,5 +333,9 @@
 
   .instruction-modal {
     width: var(--phone-width)
+  }
+
+  .flash {
+    left: calc(calc(var(--phone-width)/2) - 50px)
   }
 }

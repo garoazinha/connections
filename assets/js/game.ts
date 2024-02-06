@@ -19,7 +19,7 @@ const game = `
     <div class="header">
       <div></div>
       <div class="game__title">CONNECTIONS</div>
-      <div><button @click="handleToggleInstruction()">?</button></div>
+      <div><button @click="handleToggleInstruction()" style="font-weight: bold;">?</button></div>
     
     </div>
     <transition>
@@ -31,13 +31,13 @@ const game = `
       Escolha quatro grupos de quatro
     </div>
     <div class="game">
-      <transition>
-        <div class="flash" v-show="flash">Esse já foi!</div>
+      <transition name="fadeintou">
+        <div class="flash" v-show="flash"><p>Esse já foi!</p></div>
       </transition>
       <div class="done" >
         <transition-group name="fade" type="animation">
           <div v-for="(row, index) in foundConnections" v-bind:key="row.name" class="card" v-bind:style="{ backgroundColor: getColor(row.level) }">
-            <span>
+            <span style="font-weight: bold;">
               {{ row.name }}
             </span>
             <span>
@@ -70,6 +70,7 @@ const game = `
         class="btn clickable"
         v-bind:disabled="this.options.length < 4 || this.loading">Enviar</button>
         <div class="attempts">
+          <span style="margin-right: 10px;">Erros sobrando:   </span>
           <span v-for="n in mistakesLeft">
             *
           </span>
@@ -125,13 +126,13 @@ export default {
   methods: {
     getColor(level) {
       const colorMap = {
-        0: '#f9df6d',
-        1: '#a0c35a',
-        2: '#b0c4ef',
-        3: '#ba81c5'
+        0: 'yellow',
+        1: 'green',
+        2: 'blue',
+        3: 'purple'
       }
 
-      return colorMap[level]
+      return `var(--${colorMap[level]})`
     },
     checkSolution(_e) {
       this.checkCorrectness(this.options)
@@ -142,7 +143,7 @@ export default {
         this.flash = true
         setTimeout(() => {
           this.flash = false
-        }, 500)
+        }, 2000)
         this.options = []
         this.loading = false
         return;
