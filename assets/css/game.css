@@ -28,12 +28,18 @@
   --adorable-pink: #FFC0D9;
   --adorable-blueish: #33186B;
   --card-green: #183D3D;
+  --gray: #e2e2e2;
 }
 
 .game__title {
   font-family: 'Inter';
   font-size: x-large;
   font-weight: bold;
+}
+
+
+body {
+  background-color: var(--gray);
 }
 
 .game {
@@ -245,7 +251,6 @@
 
 .modal__title {
   font-weight: bold;
-  font-size: large;
   margin: 0 auto;
   padding: 10px 0;
 }
