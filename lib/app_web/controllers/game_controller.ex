@@ -1,10 +1,11 @@
 defmodule AppWeb.GameController do
+  alias AppWeb.Game.Groups
   use AppWeb, :controller
   import AppWeb.Game
 
   def daily(conn, _params) do
-    game = game()
-    render(conn, game: game)
+    l = %Groups{}
+    render(conn, game: l)
   end
 
   defp game do

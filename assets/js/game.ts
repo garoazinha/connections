@@ -106,8 +106,9 @@ export default {
     return store;
   },
   mounted() {
-    this.request = data
-    this.items = this.request.startingGroups.flat()
+    this.fetchData()
+
+    
   },
   computed: {
     notFound() {
@@ -124,6 +125,11 @@ export default {
     }
   },
   methods: {
+    async fetchData() {
+      const response = await fetch("/api/game");
+      this.request = await response.json();
+      this.items = this.request.startingGroups.flat();
+    },
     getColor(level) {
       const colorMap = {
         0: 'yellow',
