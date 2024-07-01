@@ -19,7 +19,7 @@ export const Modal = {
               <div style="margin: 0 auto;"> Amanhã tem mais um garotada! </div>
             </div>
             <div v-if="idle">
-              <h1 class="modal__title game__title">Connections</h1>
+              <h1 class="modal__title game__title">CONNECTIONS</h1>
               <p style="margin: 0 auto;">Encontre as palavras conectadas! xD</p>
                                 
               <button class="btn play-button" @click="handleToggleModal()">Jogar</button>

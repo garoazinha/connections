@@ -40,6 +40,9 @@
   color: white;
 }
 
+.game__title {
+  font-size: x-large;
+}
 
 body {
   background-color: var(--dark-gray);
@@ -118,8 +121,8 @@ body {
 }
 
 .clickable {
-  background-color: var(--pretty-purple-dark);
-  color: white;
+  background-color: var(--adorable-pink);
+  color: var(--dark-gray);
 }
 
 .modal {
