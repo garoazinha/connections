@@ -4,7 +4,7 @@ ARG NODE_VERSION=20.10.0
 
 RUN apt -y update \
   && apt -y upgrade \
-  && apt install -y bash curl git build-essential inotify-tools
+  && apt install -y bash curl git build-essential inotify-tools sqlite3
 
 ENV NVM_DIR /nvm
 RUN mkdir -p ${NVM_DIR} \

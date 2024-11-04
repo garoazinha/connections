@@ -4,7 +4,7 @@ defmodule AppWeb.Game do
     defstruct name: "Stuff", level: 2, members: ["One", "Two", "Three", "Four"]
   end
 
-  defmodule Groups do
+  defmodule Game do
     @derive Jason.Encoder
     defstruct groups: [struct(Group, %{name: "Movimentam o barco",
                                        level: 0,
