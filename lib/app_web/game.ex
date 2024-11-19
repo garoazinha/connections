@@ -6,44 +6,45 @@ defmodule AppWeb.Game do
 
   defmodule Game do
     @derive Jason.Encoder
-    defstruct groups: [struct(Group, %{name: "Movimentam o barco",
+    defstruct groups: [ %{title: "Movimentam o barco",
                                        level: 0,
-                                       members: [
+                                       members: Enum.join([
                                        "Vela",
                                        "Motor",
                                        "Remo",
                                        "Corrente"
-                                      ]}),
-                       struct(Group, %{name: "Iluminadores",
+                                      ], ";")},
+                       %{title: "Iluminadores",
                                         level: 1,
-                                        members: [
+                                        members: Enum.join([
                                           "Lâmpada",
                                           "Lanterna",
                                           "Fogueira",
                                           "Lamparina"
-                                        ]}),
-                       struct(Group, %{name: "Gatos da ficção",
+                                        ], ";")},
+                       %{title: "Gatos da ficção",
                                         level: 2,
-                                        members: [
+                                        members: Enum.join([
                                           "Tom",
                                           "Frajola",
                                           "Salém",
                                           "Mingau"
-                                        ]}),
-                       struct(Group, %{name: "Características da música",
+                                        ], ";")},
+                       %{title: "Características da música",
                                         level: 3,
-                                        members: [
+                                        members: Enum.join([
                                           "Melodia",
                                           "Ritmo",
                                           "Harmonia",
                                           "Tempo"
-                                        ]})],
+                                        ], ";")}],
                         startingGroups: [["Lanterna", "Vela", "Melodia", "Tom"],
                                           ["Motor", "Fogueira", "Salém", "Ritmo"],
                                           ["Harmonia", "Tempo", "Mingau", "Corrente"],
                                           ["Remo", "Frajola", "Lamparina", "Lâmpada"]]
 
   end
+
 
   defstruct groups: [struct(Group, %{name: "Movimentam o barco",
                        level: 0,

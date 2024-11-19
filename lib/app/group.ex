@@ -2,8 +2,10 @@ defmodule App.Group do
   alias App.Game
   use Ecto.Schema
   import Ecto.Changeset
+  @derive {Jason.Encoder, only: [:title, :level, :members]}
 
   schema "groups" do
+
     field :title, :string
     field :level, :integer
     field :members, :string

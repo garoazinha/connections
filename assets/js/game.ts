@@ -107,8 +107,6 @@ export default {
   },
   mounted() {
     this.fetchData()
-
-    
   },
   computed: {
     notFound() {

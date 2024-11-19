@@ -1,5 +1,4 @@
-FROM elixir:latest
-
+FROM elixir:1.17
 ARG NODE_VERSION=20.10.0
 
 RUN apt -y update \
