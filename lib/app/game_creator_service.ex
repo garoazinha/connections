@@ -3,57 +3,23 @@ defmodule App.GameCreatorService do
   alias App.Group
   alias App.Game
 
-  def execute() do
-
-    data = %{
-      groups: [
-        %{title: "Movimentam o barco",
-          level: 0,
-          members: [
-          "Vela",
-          "Motor",
-          "Remo",
-          "Corrente"
-        ]},
-        %{title: "Iluminadores",
-          level: 1,
-          members: [
-            "Lâmpada",
-            "Lanterna",
-            "Fogueira",
-            "Lamparina"
-        ]},
-        %{title: "Gatos da ficção",
-          level: 2,
-          members: [
-            "Tom",
-            "Frajola",
-            "Salém",
-            "Mingau"
-        ]},
-        %{title: "Características da música",
-          level: 3,
-          members: [
-            "Melodia",
-            "Ritmo",
-            "Harmonia",
-            "Tempo"
-        ]}
-      ],
-      startingGroups: []
-    }
-
-    game = Game.changeset(%Game{}, %{extra: "false"})
-
-
-
-    Repo.insert(game)
-
+  def execute(groups) do
+    processed_groups = process_groups(groups)
+    Game.changeset(%Game{}, %{groups: processed_groups, extra: "false"})
+      |> Repo.insert()
 
 
   end
 
   defp add_group(group) do
-    IO.puts(group)
+    %{
+      level: group.level,
+      title: group.title,
+      members: Enum.join(group.members, ";")
+    }
+  end
+
+  defp process_groups(groups) do
+    Enum.map(groups, fn group -> add_group(group) end)
   end
 end

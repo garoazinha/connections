@@ -24,6 +24,10 @@ defmodule AppWeb.Router do
     pipe_through :api
 
     get "/game", GameController, :daily
+
+    scope "/private", Private do
+      post "/game", GameController, :create
+    end
   end
 
   # Other scopes may use custom stacks.

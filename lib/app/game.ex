@@ -6,7 +6,6 @@ defmodule App.Game do
   @derive Jason.Encoder
 
   schema "games" do
-
     field :extra, :string
     has_many :groups, Group
 
