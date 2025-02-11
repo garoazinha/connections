@@ -154,13 +154,14 @@ export default {
       }
 
       const stuff = this.request.groups.map((group) => {      
-        return {members: group.members, name: group.name, level: group.level}
+        return {members: group.members, name: group.title, level: group.level}
       }).filter((row) => {
         return this.areEqual(row.members, options)
       })
 
       if (stuff.length > 0) {
 
+        console.log(stuff)
         await this.solveConnection(stuff[0].name, options, stuff[0].level)
 
       } else {
@@ -193,6 +194,7 @@ export default {
       this.items = foundChildren.concat(options).concat(itemsToMove)
 
       await sleep(1000)
+      console.log(name)
 
       this.foundConnections.push({name: name, children: options.sort(), stringified: options.sort().join(', '), level: level})
     },

@@ -13,6 +13,9 @@ defmodule AppWeb.GameJSON do
   end
 
   defp createStartingGroups(groups) do
-    Enum.map(groups, fn group -> end)
+    Enum.map(groups, fn group -> group.members end)
+      |> Enum.concat()
+      |> Enum.shuffle()
+      |> Enum.chunk_every(4)
   end
 end

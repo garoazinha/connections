@@ -8,7 +8,12 @@ defmodule AppWeb.GameController do
 
   def daily(conn, _params) do
     game = Repo.one!(from g in Game, preload: [:groups])
+    IO.inspect(game.groups)
+    res = %{
+      groups: game.groups,
+      startingGroups: game.groups
+    }
 
-    render(conn, game: game)
+    render(conn, game: res)
   end
 end
