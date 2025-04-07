@@ -4,16 +4,19 @@ defmodule App.GameCreatorService do
   alias App.Game
 
   def execute(groups) do
+    extra = groups["extra"]
     processed_groups = process_groups(groups["groups"])
-    # TODO add error handling?
-    # TODO add to cookie?
-    Game.changeset(%Game{}, %{groups: processed_groups, extra: "false"})
-      |> Repo.insert!()
 
+    if Enum.empty?(processed_groups) do
+      data = %{errors: "Put some group in that"}
+      {:error, data}
+    else
+      Game.changeset(%Game{}, %{groups: processed_groups, extra: extra})
+        |> Repo.insert()
+    end
   end
 
   defp add_group(group) do
-
     %{
       level: group["level"],
       title: group["title"],

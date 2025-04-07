@@ -36,6 +36,22 @@ defmodule AppWebGameControllerTest do
     ]
   end
 
+  test "POST /", %{conn: conn} do
+    conn = post(conn, ~p"/api/private/game", %{extra: nil, groups: []})
+
+    assert json_response(conn, 422)["errors"] == "Put some group in that"
+  end
+
+  test "post right", %{conn: conn} do
+    possible_groups = game_fixture()[:groups]
+    others =    Enum.map(possible_groups, fn g -> %{level: g.level, title: g.title, members: String.split(g.members, ";")} end)
+
+    conn = post(conn, ~p"/api/private/game", %{extra: nil, groups: others})
+
+    assert json_response(conn, 422)["errors"]["extra"] == ["can't be blank"]
+
+  end
+
   defp game_fixture() do
     %{extra: "you know",
       groups: [
