@@ -1,7 +1,6 @@
 defmodule App.Game do
   alias App.Group
   use Ecto.Schema
-  alias App.Repo
   import Ecto.Changeset
   @derive {Jason.Encoder, only: [:extra, :groups]}
 
@@ -10,10 +9,6 @@ defmodule App.Game do
     has_many :groups, Group
 
     timestamps(type: :utc_datetime)
-  end
-
-  def add_group(group) do
-    IO.puts(group)
   end
 
   def changeset(game, attrs) do

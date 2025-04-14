@@ -1,6 +1,5 @@
 defmodule App.GameCreatorService do
   alias App.Repo
-  alias App.Group
   alias App.Game
 
   def execute(groups) do

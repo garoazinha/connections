@@ -85,13 +85,6 @@ const game = `
 </section>
 `
 
-type requestType = {
-  id: Number,
-  groups: {
-
-  },
-  startingGroups: String[][]
-}
 
 export default {
   components: {
@@ -106,7 +99,41 @@ export default {
     return store;
   },
   mounted() {
-    this.fetchData()
+    const finalStatus : { plays: [][], foundConnections: any, status?: String} = store.getFromBrowser()
+    this.fetchData().then((result) => {
+      if (finalStatus.status) {
+        this.items = this.request.groups.map((el) => el.members).flat()
+        const plused = finalStatus.foundConnections
+        const requestGroups = this.request.groups.map((el) => {
+          return {
+            name: el.title,
+            children: el.members,
+            stringified: el.members.sort().join(', '),
+            level: el.level
+          }
+        })
+        if (plused.length !== 0 ) {
+
+          this.foundConnections = plused
+        } else {
+          this.foundConnections = requestGroups
+        }
+
+
+      } else if (!finalStatus.foundConnections) {
+        return
+
+      } else if (finalStatus.foundConnections.length !== 0 && !finalStatus.status) {
+          const flattenedConnections : String[] = finalStatus.foundConnections.map(el => el.children).flat()
+          let rest = this.items.filter((item: String) => {
+            return !flattenedConnections.includes(item)
+          }) 
+          this.foundConnections = finalStatus.foundConnections
+          this.items = flattenedConnections.concat(rest)
+   
+        }
+    })
+
   },
   computed: {
     notFound() {
@@ -163,10 +190,14 @@ export default {
 
         console.log(stuff)
         await this.solveConnection(stuff[0].name, options, stuff[0].level)
+        this.overallState.plays.push({items: this.options})
 
       } else {
         this.shakeables = this.options
         this.attempts.push(this.options)
+
+        this.overallState.plays.push({items: this.options})
+
         await sleep(500)
         this.shakeables = []
         
@@ -197,16 +228,18 @@ export default {
       console.log(name)
 
       this.foundConnections.push({name: name, children: options.sort(), stringified: options.sort().join(', '), level: level})
+      this.overallState.foundConnections = this.foundConnections
     },
     async finishGame() {
       await sleep(500)
       this.options = []
       this.loading = true
       for await (const element of this.notFound) {
-        await this.solveConnection(element.name, element.members, element.level)
+        await this.solveConnection(element.title, element.members, element.level)
         await sleep(1000)
       }
       this.status = 'FAILED'
+      this.overallState.status = 'FAILED'
       this.loading = false
     },
     handleToggleInstruction() {
@@ -215,12 +248,20 @@ export default {
   },
   mixins: [Mixin],
   watch: { 
+    overallState: {
+      handler(newValue, oldValue) {
+        console.log('got here')
+        this.storeInBrowser(newValue)
+      },
+      deep: true
+    }
+    ,
     foundConnections: {
       async handler(newValue, oldValue) {
         if (newValue.length === 4) {
           await sleep(1000)
           if (this.mistakesLeft > 0) {
-            
+            this.overallState.status = 'DONE'
             this.status = 'DONE'
           }
           this.toggleModal()

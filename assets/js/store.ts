@@ -1,7 +1,31 @@
 import { reactive } from 'vue'
+const today = new Date(Date.now())
+const stringifiedToday = `${today.getDate()}_${today.getMonth() + 1}_${today.getFullYear()}`
 
-export const store = reactive({
+const storageKey = `status_${stringifiedToday}`
+export type foundConnectionType = {
+  name: String, level: Number, members: [String], stringified: String
+}
+
+export type storedStateType = {
+  overallState: { plays: String[][], foundConnections: foundConnectionType[], status?: String},
+  getFromBrowser: Function,
+  items: String[],
+  foundConnections: foundConnectionType[]
+}
+
+function getFromBrowser() {
+  const rawState = localStorage.getItem(storageKey)
+  if (typeof rawState === "string") {
+  return JSON.parse(rawState) }
+  else {
+    return {plays: [], foundConnections: []}
+  }
+}
+
+export const store : storedStateType = reactive({
   request: {},
+  overallState: getFromBrowser(),
   foundConnections: [],
   options: [],
   items: [],
@@ -14,6 +38,17 @@ export const store = reactive({
   popables: [],
   flash: false,
   fastPop: [],
+  storeInBrowser(data) {
+    return localStorage.setItem(storageKey,JSON.stringify(this.overallState))
+  },
+  getFromBrowser() {
+    const rawState = localStorage.getItem(storageKey)
+    if (typeof rawState === "string") {
+    return JSON.parse(rawState) }
+    else {
+      return {plays: [], foundConnections: []}
+    }
+  },
   async select(item) {
     if (this.options.includes(item)) {
       this.deselect(item)

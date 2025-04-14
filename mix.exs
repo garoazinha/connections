@@ -34,6 +34,7 @@ defmodule App.MixProject do
     [
       {:phoenix, "~> 1.7.10"},
       {:phoenix_ecto, "~> 4.4"},
+      {:credo, "~> 1.7.0", runtime: Mix.env() == :dev},
       {:ecto_sqlite3, ">= 0.0.0"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
