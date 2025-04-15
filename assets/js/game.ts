@@ -1,11 +1,11 @@
 
-import { createApp, ref } from 'vue/dist/vue.esm-bundler.js'
+import { createApp, ref, TransitionGroup, Transition } from 'vue/dist/vue.esm-bundler.js'
 
 import { Buttonesque as buttonesque } from "./components/button"
 import { Modal as modal } from "./components/modal"
 import { Instructions as instruction } from "./components/instructions"
-import { TransitionGroup, Transition } from 'vue/dist/vue.esm-bundler.js'
 import { foundConnectionType, store } from './store'
+import { animation } from './animation'
 
 import Mixin from './helper'
 
@@ -168,78 +168,56 @@ export default {
       this.checkCorrectness(this.options)
     },
     async checkCorrectness(options : string[]) {
-      this.loading = true
-      if (this.hasBeenTried(options)) {
-        this.flash = true
-        setTimeout(() => {
-          this.flash = false
-        }, 2000)
-        store.options = []
-        this.loading = false
+      store.loading = true
+      if (store.hasBeenTried(options)) {
+        await animation.hasBeenDoneAnimation(store)
         return;
       }
+    
+      const solvableGroup : {level: number, name: string, members: string[]}|null = store.findSolvableGroup(options)
 
-      const stuff : {level: number, name: string, members: string[]}|null= store.request.groups.map((group) => {      
-        return {members: group.members, name: group.title, level: group.level}
-      }).filter((row) => {
-        return this.areEqual(row.members, options)
-      }).reduce((acc: {level: number, name: string, members: string[]}|null, currentValue) => {
-        acc = currentValue
-        return acc
-      }, null)
-
-      if (stuff) {
-        await this.solveConnection(stuff.name, options, stuff.level)
-        this.overallState.plays.push({items: store.options})
-
+      if (solvableGroup) {
+        await this.solveConnection(solvableGroup.name, options, solvableGroup.level)
       } else {
-        this.shakeables = store.options
-        store.attempts.push(store.options)
-
-        this.overallState.plays.push({items: this.options})
-
-        await sleep(500)
-        this.shakeables = []
-        
+        await animation.shakingAnimation(store)
       }
-      this.loading = false
-      store.options = []
+
+      // TODO think over what to do with state management
+      store.overallState.plays.push({items: store.options})
+
+      store.clearOptions()
+      store.loading = false
     },
     toggleModal() {
-      if (this.status === '') {
-        this.status = 'STARTED'
+      if (store.status === '') {
+        store.status = 'STARTED'
       }
       this.isOpen = !this.isOpen
     },
     async solveConnection(name: string, options: string[], level: number) {
-      this.popables = options
-      await sleep(500)
-      this.popables = []
+      await animation.popCells(store, options)
 
-      let board = [...store.items]
+      await sleep(1000)
 
-      const foundChildren = store.foundConnections.map((found) => { return found.children }).flat()
-
-      const itemsToMove = board.filter((obj) => {return !(options.includes(obj) || foundChildren.includes(obj)) })
-
-      store.items = foundChildren.concat(options).concat(itemsToMove)
+      await animation.moveBoard(store, options)
 
       await sleep(1000)
 
       store.foundConnections.push({name: name, children: options.sort(), stringified: options.sort().join(', '), level: level})
-      this.overallState.foundConnections = store.foundConnections
+
+      store.overallState.foundConnections = store.foundConnections
     },
     async finishGame() {
       await sleep(500)
-      store.options = []
-      this.loading = true
+      store.clearOptions()
+      store.loading = true
       for await (const element of this.notFound) {
         await this.solveConnection(element.title, element.members, element.level)
         await sleep(1000)
       }
-      this.status = 'FAILED'
-      this.overallState.status = 'FAILED'
-      this.loading = false
+      store.status = 'FAILED'
+      store.overallState.status = 'FAILED'
+      store.loading = false
     },
     handleToggleInstruction() {
       this.visibleInstruction = !this.visibleInstruction
@@ -249,8 +227,7 @@ export default {
   watch: { 
     overallState: {
       handler(newValue : typeof store.overallState, oldValue : typeof store.overallState) {
-        console.log('got here')
-        this.storeInBrowser(newValue)
+        store.storeInBrowser(newValue)
       },
       deep: true
     }

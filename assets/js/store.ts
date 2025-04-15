@@ -1,4 +1,5 @@
 import { reactive } from 'vue'
+import helper from './helper'
 const today = new Date(Date.now())
 const stringifiedToday = `${today.getDate()}_${today.getMonth() + 1}_${today.getFullYear()}`
 
@@ -8,7 +9,7 @@ export type foundConnectionType = {
 }
 
 export type storedStateType = {
-  overallState: { plays: string[][], foundConnections: foundConnectionType[], status?: string},
+  overallState: { plays: {}[], foundConnections: foundConnectionType[], status?: string},
   getFromBrowser: Function,
   items: string[],
   foundConnections: foundConnectionType[],
@@ -18,7 +19,26 @@ export type storedStateType = {
     startingGroups: string[]
   },
   attempts: string[][],
-  options: string[]
+  options: string[],
+  flash: boolean,
+  status: string, 
+  isOpen: boolean,
+  loading: boolean, 
+  visibleInstruction: boolean,
+  shakeables: string[],
+  popables: string[],
+  fastPop: string[],
+  storeInBrowser: Function,
+  select: Function,
+  deselect: Function,
+  isactive: Function,
+  iswrong: Function,
+  isFound: Function,
+  isright: Function,
+  hasBeenTried: Function,
+  findSolvableGroup: Function,
+  getFoundCells: Function,
+  clearOptions: Function
 }
 
 function getFromBrowser() {
@@ -63,7 +83,7 @@ export const store : storedStateType = reactive({
       if (this.options.length < 4) {
         this.options.push(item) 
         this.fastPop.push(item)
-        await setTimeout(() => {
+        setTimeout(() => {
           this.fastPop = this.fastPop.filter((i) => i !== item)
         }, 100)
         
@@ -73,7 +93,7 @@ export const store : storedStateType = reactive({
   async deselect(item) {
     this.options.splice(this.options.indexOf(item), 1)
     this.fastPop.push(item)
-    await setTimeout(() => {
+    setTimeout(() => {
       this.fastPop = this.fastPop.filter((i) => i !== item)
     }, 100)
 
@@ -93,4 +113,21 @@ export const store : storedStateType = reactive({
   hasBeenTried(options) {
     return this.attempts.some((a) => this.areEqual(options, a))
   },
+  findSolvableGroup(options) {
+    const solvableGroup = this.request.groups.map((group) => {      
+      return {members: group.members, name: group.title, level: group.level}
+    }).filter((row) => {
+      return helper.methods.areEqual(row.members, options )
+    }).reduce((acc, currentValue) => {
+      acc = currentValue
+      return acc
+    }, null)
+    return solvableGroup
+  },
+  getFoundCells() {
+    return this.foundConnections.map((found) => found.children).flat()
+  },
+  clearOptions() {
+    this.options = []
+  }
 })

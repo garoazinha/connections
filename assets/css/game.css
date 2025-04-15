@@ -164,6 +164,7 @@ body {
   background-color: aqua;
   transition: opacity 0.5s linear;
   z-index: 10000;
+  right: calc(calc(var(--desktop-width)/2) - 50px);
   width: 100px;
   display: flex;
   background-color: var(--adorable-pink);
