@@ -2,7 +2,7 @@
   "id": 192,
   "groups": [
     {
-      "name": "CONTACT VIA PHONE",
+      "title": "CONTACT VIA PHONE",
       "level": 0,
       "members": [
         "BUZZ",
@@ -12,7 +12,7 @@
       ]
     },
     {
-      "name": "BOOK SECTIONS",
+      "title": "BOOK SECTIONS",
       "level": 1,
       "members": [
         "APPENDIX",
@@ -22,7 +22,7 @@
       ]
     },
     {
-      "name": "WEE",
+      "title": "WEE",
       "level": 2,
       "members": [
         "DINKY",
@@ -32,7 +32,7 @@
       ]
     },
     {
-      "name": "CARTOON MICE",
+      "title": "CARTOON MICE",
       "level": 3,
       "members": [
         "ITCHY",

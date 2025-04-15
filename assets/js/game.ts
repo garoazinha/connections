@@ -5,12 +5,11 @@ import { Buttonesque as buttonesque } from "./components/button"
 import { Modal as modal } from "./components/modal"
 import { Instructions as instruction } from "./components/instructions"
 import { TransitionGroup, Transition } from 'vue/dist/vue.esm-bundler.js'
-import data from './request.json' assert { type: 'json' };
 import { store } from './store'
 
 import Mixin from './helper'
 
-function sleep(ms) {
+function sleep(ms : number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -100,11 +99,11 @@ export default {
   },
   mounted() {
     const finalStatus : { plays: [][], foundConnections: any, status?: String} = store.getFromBrowser()
-    this.fetchData().then((result) => {
+    this.fetchData().then((result: typeof store.request) => {
       if (finalStatus.status) {
-        this.items = this.request.groups.map((el) => el.members).flat()
+        store.items = store.request.groups.map((el) => el.members).flat()
         const plused = finalStatus.foundConnections
-        const requestGroups = this.request.groups.map((el) => {
+        const requestGroups = store.request.groups.map((el) => {
           return {
             name: el.title,
             children: el.members,
@@ -114,9 +113,9 @@ export default {
         })
         if (plused.length !== 0 ) {
 
-          this.foundConnections = plused
+          store.foundConnections = plused
         } else {
-          this.foundConnections = requestGroups
+          store.foundConnections = requestGroups
         }
 
 
@@ -124,12 +123,12 @@ export default {
         return
 
       } else if (finalStatus.foundConnections.length !== 0 && !finalStatus.status) {
-          const flattenedConnections : String[] = finalStatus.foundConnections.map(el => el.children).flat()
-          let rest = this.items.filter((item: String) => {
+          const flattenedConnections : string[] = finalStatus.foundConnections.map(el => el.children).flat()
+          let rest = this.items.filter((item: string) => {
             return !flattenedConnections.includes(item)
           }) 
-          this.foundConnections = finalStatus.foundConnections
-          this.items = flattenedConnections.concat(rest)
+          store.foundConnections = finalStatus.foundConnections
+          store.items = flattenedConnections.concat(rest)
    
         }
     })
@@ -137,8 +136,8 @@ export default {
   },
   computed: {
     notFound() {
-      const foundGroups = this.foundConnections.map((found) => found.children)
-      return this.request.groups.filter((group) => {
+      const foundGroups = store.foundConnections.map((found) => found.children)
+      return store.request.groups.filter((group) => {
         return foundGroups.map(element => {
           return this.areEqual(element, group.members)
         }).filter((e) => e === true ).length === 0;
@@ -146,16 +145,16 @@ export default {
       })
     },
     mistakesLeft() {
-      return 4 - this.attempts.length
+      return 4 - store.attempts.length
     }
   },
   methods: {
     async fetchData() {
       const response = await fetch("/api/game");
-      this.request = await response.json();
-      this.items = this.request.startingGroups.flat();
+      store.request = await response.json();
+      store.items = this.request.startingGroups.flat();
     },
-    getColor(level) {
+    getColor(level: number) {
       const colorMap = {
         0: 'yellow',
         1: 'green',
@@ -168,33 +167,34 @@ export default {
     checkSolution(_e) {
       this.checkCorrectness(this.options)
     },
-    async checkCorrectness(options) {
+    async checkCorrectness(options : string[]) {
       this.loading = true
       if (this.hasBeenTried(options)) {
         this.flash = true
         setTimeout(() => {
           this.flash = false
         }, 2000)
-        this.options = []
+        store.options = []
         this.loading = false
         return;
       }
 
-      const stuff = this.request.groups.map((group) => {      
+      const stuff : {level: number, name: string, members: string[]}|null= store.request.groups.map((group) => {      
         return {members: group.members, name: group.title, level: group.level}
       }).filter((row) => {
         return this.areEqual(row.members, options)
-      })
+      }).reduce((acc: {level: number, name: string, members: string[]}|null, currentValue) => {
+        acc = currentValue
+        return acc
+      }, null)
 
-      if (stuff.length > 0) {
-
-        console.log(stuff)
-        await this.solveConnection(stuff[0].name, options, stuff[0].level)
-        this.overallState.plays.push({items: this.options})
+      if (stuff) {
+        await this.solveConnection(stuff.name, options, stuff.level)
+        this.overallState.plays.push({items: store.options})
 
       } else {
-        this.shakeables = this.options
-        this.attempts.push(this.options)
+        this.shakeables = store.options
+        store.attempts.push(store.options)
 
         this.overallState.plays.push({items: this.options})
 
@@ -203,7 +203,7 @@ export default {
         
       }
       this.loading = false
-      this.options = []
+      store.options = []
     },
     toggleModal() {
       if (this.status === '') {
@@ -211,21 +211,20 @@ export default {
       }
       this.isOpen = !this.isOpen
     },
-    async solveConnection(name, options, level) {
+    async solveConnection(name: string, options: string[], level: number) {
       this.popables = options
       await sleep(500)
       this.popables = []
 
-      let board = [...this.items]
+      let board = [...store.items]
 
-      const foundChildren = this.foundConnections.map((found) => { return found.children }).flat()
+      const foundChildren = store.foundConnections.map((found) => { return found.children }).flat()
 
       const itemsToMove = board.filter((obj) => {return !(options.includes(obj) || foundChildren.includes(obj)) })
 
       this.items = foundChildren.concat(options).concat(itemsToMove)
 
       await sleep(1000)
-      console.log(name)
 
       this.foundConnections.push({name: name, children: options.sort(), stringified: options.sort().join(', '), level: level})
       this.overallState.foundConnections = this.foundConnections
@@ -249,7 +248,7 @@ export default {
   mixins: [Mixin],
   watch: { 
     overallState: {
-      handler(newValue, oldValue) {
+      handler(newValue : typeof store.overallState, oldValue : typeof store.overallState) {
         console.log('got here')
         this.storeInBrowser(newValue)
       },
@@ -257,7 +256,7 @@ export default {
     }
     ,
     foundConnections: {
-      async handler(newValue, oldValue) {
+      async handler(newValue: any[], oldValue: any[]) {
         if (newValue.length === 4) {
           await sleep(1000)
           if (this.mistakesLeft > 0) {
@@ -270,7 +269,7 @@ export default {
       deep:true,
     },
     mistakesLeft: {
-      handler(newValue, oldValue) {
+      handler(newValue:number, oldValue:number) {
         if (newValue === 0) {
           this.finishGame()
         }

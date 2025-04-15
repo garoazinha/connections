@@ -4,14 +4,20 @@ const stringifiedToday = `${today.getDate()}_${today.getMonth() + 1}_${today.get
 
 const storageKey = `status_${stringifiedToday}`
 export type foundConnectionType = {
-  name: String, level: Number, members: [String], stringified: String
+  name: string, level: Number, children: string[], stringified: string
 }
 
 export type storedStateType = {
-  overallState: { plays: String[][], foundConnections: foundConnectionType[], status?: String},
+  overallState: { plays: string[][], foundConnections: foundConnectionType[], status?: string},
   getFromBrowser: Function,
-  items: String[],
-  foundConnections: foundConnectionType[]
+  items: string[],
+  foundConnections: foundConnectionType[],
+  request: {
+    id: number,
+    groups: {title: string, members: string[], level: number}[]|[]
+  },
+  attempts: string[][],
+  options: string[]
 }
 
 function getFromBrowser() {
@@ -24,7 +30,7 @@ function getFromBrowser() {
 }
 
 export const store : storedStateType = reactive({
-  request: {},
+  request: {id: 0, groups: []},
   overallState: getFromBrowser(),
   foundConnections: [],
   options: [],
