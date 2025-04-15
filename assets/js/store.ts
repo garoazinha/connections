@@ -14,7 +14,8 @@ export type storedStateType = {
   foundConnections: foundConnectionType[],
   request: {
     id: number,
-    groups: {title: string, members: string[], level: number}[]|[]
+    groups: {title: string, members: string[], level: number}[]|[],
+    startingGroups: string[]
   },
   attempts: string[][],
   options: string[]
@@ -30,7 +31,7 @@ function getFromBrowser() {
 }
 
 export const store : storedStateType = reactive({
-  request: {id: 0, groups: []},
+  request: {id: 0, groups: [], startingGroups:[]},
   overallState: getFromBrowser(),
   foundConnections: [],
   options: [],

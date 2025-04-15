@@ -5,7 +5,7 @@ import { Buttonesque as buttonesque } from "./components/button"
 import { Modal as modal } from "./components/modal"
 import { Instructions as instruction } from "./components/instructions"
 import { TransitionGroup, Transition } from 'vue/dist/vue.esm-bundler.js'
-import { store } from './store'
+import { foundConnectionType, store } from './store'
 
 import Mixin from './helper'
 
@@ -98,7 +98,7 @@ export default {
     return store;
   },
   mounted() {
-    const finalStatus : { plays: [][], foundConnections: any, status?: String} = store.getFromBrowser()
+    const finalStatus : { plays: [][], foundConnections: foundConnectionType[], status?: string} = store.getFromBrowser()
     this.fetchData().then((result: typeof store.request) => {
       if (finalStatus.status) {
         store.items = store.request.groups.map((el) => el.members).flat()
@@ -124,7 +124,7 @@ export default {
 
       } else if (finalStatus.foundConnections.length !== 0 && !finalStatus.status) {
           const flattenedConnections : string[] = finalStatus.foundConnections.map(el => el.children).flat()
-          let rest = this.items.filter((item: string) => {
+          let rest = store.items.filter((item: string) => {
             return !flattenedConnections.includes(item)
           }) 
           store.foundConnections = finalStatus.foundConnections
@@ -222,16 +222,16 @@ export default {
 
       const itemsToMove = board.filter((obj) => {return !(options.includes(obj) || foundChildren.includes(obj)) })
 
-      this.items = foundChildren.concat(options).concat(itemsToMove)
+      store.items = foundChildren.concat(options).concat(itemsToMove)
 
       await sleep(1000)
 
-      this.foundConnections.push({name: name, children: options.sort(), stringified: options.sort().join(', '), level: level})
-      this.overallState.foundConnections = this.foundConnections
+      store.foundConnections.push({name: name, children: options.sort(), stringified: options.sort().join(', '), level: level})
+      this.overallState.foundConnections = store.foundConnections
     },
     async finishGame() {
       await sleep(500)
-      this.options = []
+      store.options = []
       this.loading = true
       for await (const element of this.notFound) {
         await this.solveConnection(element.title, element.members, element.level)
